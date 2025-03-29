@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import MyTours from './components/MyTours';
 import RentalServices from './components/RentalServices';
 import LandingPage from './components/LandingPage';
+import RefillStations from './components/RefillStations';
 import { Itinerary, UserPreferences } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import { generateTourItinerary } from './lib/openai';
@@ -160,6 +161,7 @@ function App() {
               <Route path="/plan-tour" element={<TourPlanner />} />
               <Route path="/my-tours" element={<MyTours />} />
               <Route path="/vehicle-rental" element={<RentalServices />} />
+              <Route path="/refill-stations" element={<RefillStations />} />
             </Routes>
           </main>
         </div>

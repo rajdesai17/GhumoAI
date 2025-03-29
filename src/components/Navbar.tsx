@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigation, Car, MapPin, Calendar, ArrowLeft, User, LogOut } from 'lucide-react';
+import { Navigation, Car, MapPin, ArrowLeft, User, LogOut, Droplet } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
@@ -66,6 +66,17 @@ const Navbar: React.FC = () => {
               >
                 <Car className="w-5 h-5" />
                 <span>Rent Vehicle</span>
+              </Link>
+              <Link
+                to="/refill-stations"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/refill-stations')
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Droplet className="w-5 h-5" />
+                <span>Refill Stations</span>
               </Link>
               <Link
                 to="/my-tours"

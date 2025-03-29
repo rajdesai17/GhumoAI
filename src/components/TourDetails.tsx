@@ -163,14 +163,14 @@ export default function TourDetails({
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Transportation</h3>
-          <p className="text-gray-600">{itinerary.transportation}</p>
+          {/* <h3 className="text-lg font-semibold text-gray-900 mb-2">Transportation</h3>
+          <p className="text-gray-600">{itinerary.transportation}</p> */}
         </div>
 
-        <div>
+        {/* <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Additional Notes</h3>
           <p className="text-gray-600">{itinerary.notes}</p>
-        </div>
+        </div> */}
 
         {itinerary.tips && itinerary.tips.length > 0 && (
           <div>
