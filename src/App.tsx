@@ -13,6 +13,7 @@ function TourPlanner() {
   const [itinerary, setItinerary] = useState<Itinerary>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
+  const [focusedPlaceId, setFocusedPlaceId] = useState<string>();
   
   const handlePreferencesSubmit = async (preferences: UserPreferences) => {
     setLoading(true);
@@ -51,6 +52,7 @@ function TourPlanner() {
                   itinerary={itinerary}
                   onSaveTour={() => console.log('Saving tour...')}
                   onStartNavigation={() => console.log('Starting navigation...')}
+                  onViewLocation={setFocusedPlaceId}
                 />
               </div>
               
@@ -59,6 +61,7 @@ function TourPlanner() {
                   <Map
                     center={[40.7128, -74.0060]} // Default to NYC
                     itinerary={itinerary}
+                    focusedPlaceId={focusedPlaceId}
                   />
                 </div>
               </div>

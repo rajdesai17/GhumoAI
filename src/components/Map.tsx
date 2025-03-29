@@ -1,14 +1,30 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Itinerary, Place } from '../types';
 
 interface MapProps {
   itinerary?: Itinerary;
   center: [number, number];
+  focusedPlaceId?: string;
 }
 
-export default function Map({ itinerary, center }: MapProps) {
+// Helper component to handle map view updates
+function MapController({ place }: { place?: Place }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (place) {
+      map.setView(place.location, 15, { animate: true });
+    }
+  }, [map, place]);
+
+  return null;
+}
+
+export default function Map({ itinerary, center, focusedPlaceId }: MapProps) {
+  const focusedPlace = itinerary?.places.find(place => place.id === focusedPlaceId);
+
   return (
     <MapContainer
       center={center}
@@ -21,7 +37,11 @@ export default function Map({ itinerary, center }: MapProps) {
       />
       
       {itinerary?.places.map((place: Place) => (
-        <Marker key={place.id} position={place.location}>
+        <Marker 
+          key={place.id} 
+          position={place.location}
+          opacity={focusedPlaceId ? (place.id === focusedPlaceId ? 1 : 0.5) : 1}
+        >
           <Popup>
             <div className="p-2">
               <h3 className="font-bold">{place.name}</h3>
@@ -38,9 +58,11 @@ export default function Map({ itinerary, center }: MapProps) {
           positions={itinerary.route}
           color="blue"
           weight={3}
-          opacity={0.7}
+          opacity={focusedPlaceId ? 0.3 : 0.7}
         />
       )}
+
+      <MapController place={focusedPlace} />
     </MapContainer>
   );
 }
