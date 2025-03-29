@@ -118,10 +118,23 @@ function TourPlanner() {
           </div>
         </div>
       ) : (
-        <div className="max-w-[90rem] mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
-            {/* Left side: Tour Details */}
-            <div className="w-[45%] min-w-[400px]">
+        <div className="container mx-auto px-4 py-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left side: Map */}
+            <div className="lg:w-[40%] flex-shrink-0">
+              <div className="sticky top-24 bg-white rounded-lg shadow-lg overflow-hidden aspect-square">
+                <Map
+                  center={mapCenter}
+                  itinerary={itinerary}
+                  currentLocation={currentLocation}
+                  activePlaceIndex={activePlaceIndex}
+                  onLocationSelect={handleLocationSelect}
+                />
+              </div>
+            </div>
+
+            {/* Right side: Tour Details */}
+            <div className="lg:w-[60%] flex-shrink-0">
               <TourDetails
                 itinerary={itinerary}
                 currentLocation={currentLocation}
@@ -129,17 +142,6 @@ function TourPlanner() {
                 onStartNavigation={handleStartNavigation}
                 onSaveTour={handleSaveTour}
                 canSave={true}
-              />
-            </div>
-            
-            {/* Right side: Map */}
-            <div className="flex-1 bg-white rounded-lg shadow-lg overflow-hidden sticky top-24 h-[calc(100vh-8rem)]">
-              <Map
-                center={mapCenter}
-                itinerary={itinerary}
-                currentLocation={currentLocation}
-                activePlaceIndex={activePlaceIndex}
-                onLocationSelect={handleLocationSelect}
               />
             </div>
           </div>
@@ -160,7 +162,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/plan-tour" element={<TourPlanner />} />
               <Route path="/my-tours" element={<MyTours />} />
-              <Route path="/vehicle-rental" element={<RentalServices />} />
+              <Route path="/rent-vehicle" element={<RentalServices />} />
               <Route path="/refill-stations" element={<RefillStations />} />
             </Routes>
           </main>

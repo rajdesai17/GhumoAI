@@ -88,11 +88,49 @@ interface MapProps {
 }
 
 // Component to handle map center updates
-function MapUpdater({ center }: { center: [number, number] }) {
+function MapUpdater({ places, currentLocation, activePlaceIndex }: { places: Place[], currentLocation?: [number, number], activePlaceIndex?: number }) {
   const map = useMap();
+
   useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
+    if (currentLocation && activePlaceIndex !== undefined && places[activePlaceIndex]) {
+      const start = L.latLng(currentLocation[0], currentLocation[1]);
+      const end = L.latLng(
+        places[activePlaceIndex].location[0],
+        places[activePlaceIndex].location[1]
+      );
+
+      try {
+        // Remove existing route if any
+        const routingControl = L.Routing.control({
+          waypoints: [start, end],
+          routeWhileDragging: true,
+          lineOptions: {
+            styles: [{ color: '#6FA1EC', opacity: 0.6, weight: 3 }],
+          },
+          plan: {
+            summary: false,
+            instructions: false,
+          },
+          draggableWaypoints: true,
+          addWaypoints: false,
+          autoRoute: true,
+        });
+
+        // Fit bounds to show the entire route
+        const bounds = L.latLngBounds([start, end]);
+        map.fitBounds(bounds, { padding: [50, 50] });
+      } catch (error) {
+        console.error('Error setting up route:', error);
+        // Show error to user
+        const errorPopup = L.popup()
+          .setLatLng(start)
+          .setContent('Failed to calculate route. Please try again.')
+          .openOn(map);
+        setTimeout(() => errorPopup.close(), 3000);
+      }
+    }
+  }, [map, currentLocation, activePlaceIndex, places]);
+
   return null;
 }
 
@@ -211,7 +249,7 @@ export default function Map({ center, itinerary, onLocationSelect, currentLocati
   return (
     <div className="relative w-full h-full">
       {error && (
-        <div className="absolute top-4 left-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="absolute top-4 left-4 z-10 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -219,19 +257,13 @@ export default function Map({ center, itinerary, onLocationSelect, currentLocati
         center={center}
         zoom={13}
         style={{ height: '100%', width: '100%' }}
+        className="z-0"
       >
-        <MapUpdater center={center} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        <MapContent
-          itinerary={itinerary}
-          currentLocation={currentLocation || userLocation}
-          activePlaceIndex={activePlaceIndex}
-        />
-
         {/* Show route if available */}
         {route.length > 0 && (
           <Polyline
@@ -242,89 +274,36 @@ export default function Map({ center, itinerary, onLocationSelect, currentLocati
           />
         )}
 
-        {/* Show all places with floating cards and enhanced popups */}
+        {/* Show all places */}
         {places.map((place, index) => (
-          <React.Fragment key={place.id}>
-            <Marker
-              position={place.location}
-              icon={createFloatingCard(place, index)}
-              interactive={false}
-            />
-            <Marker
-              position={place.location}
-              icon={icon}
-            >
-              <Popup className="custom-popup">
-                <div className="p-3 space-y-2 min-w-[250px]">
-                  <div className="font-bold text-lg text-blue-600">
-                    Stop {index + 1}: {place.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <div><strong>Type:</strong> {place.type}</div>
-                    <div><strong>Duration:</strong> {place.duration} minutes</div>
-                    <div><strong>Coordinates:</strong> {formatCoordinates(place.location)}</div>
-                  </div>
-                  {place.description && (
-                    <div className="mt-2 text-sm border-t pt-2 text-gray-700">
-                      {place.description}
-                    </div>
-                  )}
+          <Marker
+            key={place.id}
+            position={place.location}
+            eventHandlers={{
+              click: () => onLocationSelect?.(place.location)
+            }}
+          >
+            <Popup>
+              <div className="p-3 min-w-[200px]">
+                <h3 className="font-semibold text-gray-900">
+                  {index + 1}. {place.name}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {place.description}
+                </p>
+                <div className="mt-2 text-xs text-gray-500">
+                  Duration: {place.duration} mins
                 </div>
-              </Popup>
-            </Marker>
-          </React.Fragment>
+              </div>
+            </Popup>
+          </Marker>
         ))}
 
-        {/* Show food recommendations */}
-        {foodSpots.map((foodSpot) => (
-          <React.Fragment key={foodSpot.id}>
-            <Marker
-              position={foodSpot.location}
-              icon={createFoodCard(foodSpot)}
-              interactive={false}
-            />
-            <Marker
-              position={foodSpot.location}
-              icon={foodIcon}
-            >
-              <Popup className="custom-popup">
-                <div className="p-3 space-y-2 min-w-[300px] food-recommendation">
-                  <div className="font-bold text-lg text-red-600">
-                    🍽️ {foodSpot.name}
-                  </div>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <div><strong>Type:</strong> {foodSpot.type.replace('_', ' ').charAt(0).toUpperCase() + foodSpot.type.slice(1)}</div>
-                    <div><strong>Cuisine:</strong> {foodSpot.cuisineTypes.join(', ')}</div>
-                    <div><strong>Price Range:</strong> {formatPriceRange(foodSpot.priceRange)}</div>
-                    <div><strong>Rating:</strong> {formatRating(foodSpot.rating)} ({foodSpot.reviews} reviews)</div>
-                    <div><strong>Hours:</strong> {foodSpot.openingHours}</div>
-                    {foodSpot.distance && (
-                      <div><strong>Distance:</strong> {foodSpot.distance.toFixed(1)} km from nearest stop</div>
-                    )}
-                  </div>
-                  <div className="mt-2 text-sm border-t pt-2 text-gray-700">
-                    {foodSpot.description}
-                  </div>
-                  {foodSpot.recommendations.length > 0 && (
-                    <div className="mt-2 text-sm border-t pt-2">
-                      <strong>Top Picks:</strong>
-                      <ul className="list-disc list-inside mt-1 text-gray-700">
-                        {foodSpot.recommendations.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          </React.Fragment>
-        ))}
-
+        {/* Show current location */}
         {currentLocation && (
           <Marker
             position={currentLocation}
-            icon={new L.Icon.Default({ className: 'bg-blue-500' })}
+            icon={new L.Icon.Default()}
           >
             <Popup>
               <div className="p-2">
@@ -333,6 +312,13 @@ export default function Map({ center, itinerary, onLocationSelect, currentLocati
             </Popup>
           </Marker>
         )}
+
+        {/* Auto-fit bounds when places change */}
+        <MapUpdater
+          places={places}
+          currentLocation={currentLocation}
+          activePlaceIndex={activePlaceIndex}
+        />
       </MapContainer>
     </div>
   );

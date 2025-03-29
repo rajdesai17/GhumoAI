@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/map.css';
 import { Icon } from 'leaflet';
-import { Droplet, Search } from 'lucide-react';
+import { Droplet, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -74,6 +74,7 @@ const refillStations = [
 
 const RefillStations: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
   const filteredStations = refillStations.filter(station => 
     station.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,23 +92,55 @@ const RefillStations: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Section - Map */}
-          <div className="lg:col-span-3">
-            {/* Search Bar */}
-            <div className="mb-4 relative">
-              <input
-                type="text"
-                placeholder="Search for refill stations..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-12 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
+          <div className="lg:col-start-2 lg:col-span-10">
+            {/* Search and Description Toggle */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Search for refill stations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-3 pl-12 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 transform -translate-y-1/2" />
+              </div>
+              <button
+                onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+                className="flex items-center gap-2 px-4 py-3 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+              >
+                <span className="text-slate-700 font-medium">Description</span>
+                {isDescriptionOpen ? (
+                  <ChevronUp className="w-5 h-5 text-slate-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-slate-600" />
+                )}
+              </button>
             </div>
 
+            {/* Description Panel */}
+            {isDescriptionOpen && (
+              <div className="mb-4 bg-white rounded-xl shadow-lg p-6 animate-fadeIn">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Refill Stations</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredStations.map((station) => (
+                    <div key={station.id} className="p-4 bg-slate-50 rounded-lg">
+                      <h4 className="font-semibold text-slate-900">{station.name}</h4>
+                      <p className="text-sm text-slate-600 mt-1">{station.description}</p>
+                      <div className="mt-2 space-y-1 text-sm text-slate-600">
+                        <p>Hours: {station.operatingHours}</p>
+                        <p>Type: {station.waterType}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Map */}
-            <div className="h-[600px] rounded-xl overflow-hidden shadow-lg">
+            <div className="h-[400px] rounded-xl overflow-hidden shadow-lg">
               <MapContainer 
                 center={[26.9124, 75.7873]} 
                 zoom={13} 
@@ -146,9 +179,9 @@ const RefillStations: React.FC = () => {
           </div>
 
           {/* Right Section - Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Sustainability Information */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="lg:col-start-2 lg:col-span-10 bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Why Refill?</h2>
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -189,7 +222,7 @@ const RefillStations: React.FC = () => {
             </div>
 
             {/* Info Cards */}
-            <div className="space-y-4">
+            <div className="lg:col-start-2 lg:col-span-10 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-6 bg-blue-50 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <Droplet className="w-6 h-6 text-blue-600" />
