@@ -132,16 +132,26 @@ export async function generateTourItinerary(preferences: UserPreferences): Promi
 - Pace: ${preferences.pace}
 ${preferences.additionalNotes ? `Additional notes: ${preferences.additionalNotes}` : ''}
 
-Please provide a JSON response with the following structure:
+IMPORTANT: You must respond with ONLY a valid JSON object, no other text. The JSON must follow this exact structure:
 {
   "title": "Descriptive tour title",
   "places": [{
     "id": "unique_string",
     "name": "Place name",
-    "description": "Detailed description",
+    "description": "A detailed, engaging description that includes:
+      - Historical significance and background
+      - Key features and highlights
+      - Interesting facts and stories
+      - Best times to visit
+      - What makes it special
+      - Cultural or architectural significance
+      Format it as a natural, engaging narrative like a tour guide would tell it.",
     "location": [latitude, longitude],
     "duration": minutes_as_number,
-    "type": "attraction_type"
+    "type": "attraction_type",
+    "historicalFacts": ["fact1", "fact2", "fact3"],
+    "bestTimeToVisit": "specific time or season",
+    "highlights": ["highlight1", "highlight2", "highlight3"]
   }],
   "totalDuration": total_minutes_as_number,
   "transportTimes": [minutes_between_stops_as_numbers],
@@ -149,21 +159,36 @@ Please provide a JSON response with the following structure:
 }
 
 Ensure all coordinates are accurate and verified for ${preferences.location}.
-Duration should be realistic for each location.`;
+Duration should be realistic for each location.
+Make the descriptions engaging and informative, like a professional tour guide would tell them.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ 
         role: "system", 
-        content: "You are a knowledgeable tour guide with accurate information about locations worldwide. Always verify coordinates and provide realistic durations."
+        content: "You are a knowledgeable tour guide with accurate information about locations worldwide. You must respond with ONLY valid JSON, no other text or explanations. The response must be a single JSON object that can be parsed by JSON.parse()."
       },
       { role: "user", content: prompt }],
-      temperature: 0.7,
+      temperature: 0.7
     });
 
-    const itineraryData = JSON.parse(completion.choices[0].message.content || '{}');
+    const responseContent = completion.choices[0].message.content;
+    if (!responseContent) {
+      throw new Error('Empty response from API');
+    }
+
+    let itineraryData;
+    try {
+      // Clean the response content to ensure it's valid JSON
+      const cleanedContent = responseContent.trim().replace(/^```json\n?|\n?```$/g, '');
+      itineraryData = JSON.parse(cleanedContent);
+    } catch (error) {
+      console.error('Failed to parse API response:', responseContent);
+      throw new Error('Invalid JSON response from API. Please try again.');
+    }
     
     if (!validateItineraryData(itineraryData)) {
+      console.error('Invalid itinerary data:', itineraryData);
       throw new Error('Invalid itinerary data structure received from API');
     }
 
@@ -229,11 +254,11 @@ Ensure all information is current and verified.`;
       return minDistance <= 0.5; // Within 500 meters of the route
     });
 
-    // Combine the itinerary with food recommendations and route
+    // Combine the itinerary with food recommendations
     return {
       ...itineraryData,
-      route,
-      transportMode: itineraryData.transportMode || 'walking',
+      transportation: itineraryData.transportMode || 'walking',
+      notes: 'Generated tour itinerary',
       foodRecommendations: filteredFoodSpots,
     };
 

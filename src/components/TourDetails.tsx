@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { saveTour } from '../lib/tourService';
 import { openGoogleMapsDirections } from '../lib/maps';
 import type { Itinerary } from '../types';
+import AudioGuide from './AudioGuide';
 
 interface TourDetailsProps {
   itinerary: Itinerary;
@@ -60,6 +61,13 @@ export default function TourDetails({
     }
   };
 
+  // Function to get first two lines of description
+  const getBriefDescription = (description: string) => {
+    const sentences = description.split('.');
+    const firstTwoSentences = sentences.slice(0, 2).join('.') + '.';
+    return firstTwoSentences;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       {error && (
@@ -81,7 +89,7 @@ export default function TourDetails({
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Places to Visit</h3>
           <ul className="space-y-4">
             {itinerary.places.map((place, index) => (
-              <li key={index} className="bg-gray-50 rounded-lg p-4">
+              <li key={index} className={`bg-gray-50 rounded-lg p-4 ${activePlaceIndex === index ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-200'}`}>
                 <div className="flex items-start">
                   <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-medium">
                     {index + 1}
@@ -115,6 +123,14 @@ export default function TourDetails({
 
                     {/* Action Buttons */}
                     <div className="mt-4 flex items-center space-x-2">
+                      <AudioGuide
+                        briefText={getBriefDescription(place.description)}
+                        fullText={place.description}
+                        placeName={place.name}
+                        historicalFacts={place.historicalFacts}
+                        bestTimeToVisit={place.bestTimeToVisit}
+                        highlights={place.highlights}
+                      />
                       <button
                         onClick={() => handleStartNavigation(index)}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

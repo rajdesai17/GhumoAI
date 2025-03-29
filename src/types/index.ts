@@ -16,6 +16,9 @@ export interface Place {
   location: [number, number];
   duration: number; // in minutes
   type: string;
+  historicalFacts?: string[];
+  bestTimeToVisit?: string;
+  highlights?: string[];
 }
 
 export interface FoodSpot {
