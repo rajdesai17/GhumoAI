@@ -8,6 +8,7 @@ import VehicleRental from './components/VehicleRental';
 import Navbar from './components/Navbar';
 import { generateTourItinerary } from './lib/openai';
 import type { UserPreferences, Itinerary } from './types';
+import RentalServices from './components/RentalServices';
 
 function TourPlanner() {
   const [itinerary, setItinerary] = useState<Itinerary>();
@@ -102,7 +103,7 @@ function App() {
           <div className="pt-16">
             <Routes>
               <Route path="/" element={<TourPlanner />} />
-              <Route path="/rentals" element={<VehicleRental />} />
+              <Route path="/rental-services" element={<RentalServices />} />
               <Route path="/my-tours" element={
                 <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
                   <h1 className="text-3xl font-bold text-gray-900">My Tours (Coming Soon)</h1>

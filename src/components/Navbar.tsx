@@ -36,9 +36,9 @@ export default function Navbar() {
                 <MapPin className="w-5 h-5" />
                 <span>Plan Tour</span>
               </Link>
-              <Link to="/rentals" className={`flex items-center space-x-2 ${isActive('/rentals')}`}>
+              <Link to="/rental-services" className={`flex items-center space-x-2 ${isActive('/rental-services')}`}>
                 <Car className="w-5 h-5" />
-                <span>Vehicle Rental</span>
+                <span>Rental Services</span>
               </Link>
               <Link to="/my-tours" className={`flex items-center space-x-2 ${isActive('/my-tours')}`}>
                 <Calendar className="w-5 h-5" />
