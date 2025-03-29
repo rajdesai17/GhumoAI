@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import PreferencesForm from './components/PreferencesForm';
 import Map from './components/Map';
 import TourDetails from './components/TourDetails';
+import VehicleRental from './components/VehicleRental';
+import Navbar from './components/Navbar';
 import { generateTourItinerary } from './lib/openai';
 import type { UserPreferences, Itinerary } from './types';
 
-function App() {
-  const [showLanding, setShowLanding] = useState(true);
+function TourPlanner() {
   const [itinerary, setItinerary] = useState<Itinerary>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -27,13 +29,9 @@ function App() {
     }
   };
 
-  if (showLanding) {
-    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="space-y-8">
           {!itinerary ? (
             <>
@@ -69,6 +67,33 @@ function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+function App() {
+  const [showLanding, setShowLanding] = useState(true);
+
+  return (
+    <Router>
+      {showLanding ? (
+        <LandingPage onGetStarted={() => setShowLanding(false)} />
+      ) : (
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <div className="pt-16">
+            <Routes>
+              <Route path="/" element={<TourPlanner />} />
+              <Route path="/rentals" element={<VehicleRental />} />
+              <Route path="/my-tours" element={
+                <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+                  <h1 className="text-3xl font-bold text-gray-900">My Tours (Coming Soon)</h1>
+                </div>
+              } />
+            </Routes>
+          </div>
+        </div>
+      )}
+    </Router>
   );
 }
 

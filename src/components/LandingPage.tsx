@@ -1,11 +1,19 @@
 import React from 'react';
 import { Navigation } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
 export default function LandingPage({ onGetStarted }: LandingPageProps) {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    onGetStarted();
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <header className="bg-white/80 backdrop-blur-sm fixed w-full top-0 z-50">
@@ -15,18 +23,12 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               <Navigation className="w-8 h-8 text-blue-600" />
               <span className="text-2xl font-bold text-gray-900">GhumoAI</span>
             </div>
-            <div className="flex items-center space-x-6">
-              <a href="#" className="text-gray-600 hover:text-gray-900">Home</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Explore</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Tours</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Map</a>
-              <button
-                onClick={onGetStarted}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Get Started
-              </button>
-            </div>
+            <button
+              onClick={handleGetStarted}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Get Started
+            </button>
           </div>
         </nav>
       </header>
@@ -42,7 +44,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               and let us plan the perfect tour for you.
             </p>
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               Start Planning Your Tour
