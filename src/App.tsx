@@ -34,32 +34,38 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-8">
-            {!itinerary ? (
-              <>
+        <div className="space-y-8">
+          {!itinerary ? (
+            <>
+              <div className="max-w-2xl mx-auto">
                 <PreferencesForm onSubmit={handlePreferencesSubmit} isLoading={loading} />
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                     {error}
                   </div>
                 )}
-              </>
-            ) : (
-              <TourDetails 
-                itinerary={itinerary}
-                onSaveTour={() => console.log('Saving tour...')}
-                onStartNavigation={() => console.log('Starting navigation...')}
-              />
-            )}
-          </div>
-          
-          <div className="h-[600px] bg-white rounded-lg shadow-lg overflow-hidden">
-            <Map
-              center={[40.7128, -74.0060]} // Default to NYC
-              itinerary={itinerary}
-            />
-          </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="max-w-3xl mx-auto">
+                <TourDetails 
+                  itinerary={itinerary}
+                  onSaveTour={() => console.log('Saving tour...')}
+                  onStartNavigation={() => console.log('Starting navigation...')}
+                />
+              </div>
+              
+              <div className="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="h-[500px]">
+                  <Map
+                    center={[40.7128, -74.0060]} // Default to NYC
+                    itinerary={itinerary}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>
