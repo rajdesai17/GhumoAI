@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Info, AlertCircle } from 'lucide-react';
-import { textToSpeech } from '../lib/elevenLabs';
+import { textToSpeech, getVoices, stopSpeaking, resumeSpeaking, isPaused } from '../lib/elevenLabs';
 
 interface AudioGuideProps {
   briefText: string;
@@ -22,134 +22,101 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
 
-  // Create the narrative text
-  const narrative = `Welcome to ${placeName}! ${fullText} ${
+  // Create the narrative text with proper formatting
+  const narrative = [
+    `Welcome to ${placeName}!`,
+    fullText,
     historicalFacts.length > 0 
-      ? `\n\nDid you know? ${historicalFacts.join(' ')}` 
-      : ''
-  } ${
+      ? `Did you know? ${historicalFacts.join(' ')}` 
+      : '',
     bestTimeToVisit 
-      ? `\n\nThe best time to visit is ${bestTimeToVisit}.` 
-      : ''
-  } ${
+      ? `The best time to visit is ${bestTimeToVisit}.` 
+      : '',
     highlights.length > 0 
-      ? `\n\nKey highlights include: ${highlights.join(', ')}.` 
+      ? `Key highlights include: ${highlights.join(', ')}.` 
       : ''
-  }`;
+  ]
+    .filter(Boolean) // Remove empty strings
+    .join(' '); // Join with spaces
 
-  // Initialize audio when component mounts or narrative changes
+  // Initialize voice when component mounts
   useEffect(() => {
-    let isMounted = true;
-
-    const generateAudio = async () => {
+    const loadVoices = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
-        const audioBuffer = await textToSpeech(narrative);
-        
-        if (!isMounted) return;
-
-        // Clean up previous audio URL if it exists
-        if (audioUrl) {
-          URL.revokeObjectURL(audioUrl);
-        }
-
-        const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
-
-        const newAudio = new Audio(url);
-        
-        newAudio.onended = () => {
-          if (isMounted) {
-            setIsPlaying(false);
-          }
-        };
-
-        newAudio.onerror = (error) => {
-          console.error('Audio playback error:', error);
-          if (isMounted) {
-            setIsPlaying(false);
-            setError('Failed to play audio. Please try again.');
-          }
-        };
-
-        if (isMounted) {
-          setAudio(newAudio);
+        const voices = await getVoices();
+        if (voices.length > 0) {
+          // Try to find an English voice
+          const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
+          setSelectedVoice(englishVoice || voices[0]);
         }
       } catch (error) {
-        console.error('Error generating audio:', error);
-        if (isMounted) {
-          setIsPlaying(false);
-          setError(error instanceof Error ? error.message : 'Failed to generate audio guide');
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        console.error('Error loading voices:', error);
+        setError('Failed to load text-to-speech voices');
       }
     };
 
-    generateAudio();
-
-    return () => {
-      isMounted = false;
-      if (audio) {
-        audio.pause();
-        audio.src = '';
-      }
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-    };
-  }, [narrative, audioUrl]);
-
-  // Handle mute/unmute
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (audio) {
-      audio.volume = isMuted ? 1 : 0;
-    }
-  };
+    loadVoices();
+  }, []);
 
   // Handle play/pause
   const togglePlay = async () => {
-    if (!audio) return;
-
     try {
       if (isPlaying) {
-        await audio.pause();
+        if (isPaused()) {
+          resumeSpeaking();
+        } else {
+          stopSpeaking();
+        }
       } else {
-        await audio.play();
+        await textToSpeech(narrative, {
+          voice: selectedVoice || undefined,
+          rate: 0.9, // Slightly slower for better clarity
+          pitch: 1,
+          volume: isMuted ? 0 : 1
+        });
       }
       setIsPlaying(!isPlaying);
     } catch (error) {
       console.error('Error playing audio:', error);
       setIsPlaying(false);
-      setError('Failed to play audio. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to play audio guide');
     }
   };
+
+  // Handle mute/unmute
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (isPlaying) {
+      stopSpeaking();
+      textToSpeech(narrative, {
+        voice: selectedVoice || undefined,
+        rate: 0.9,
+        pitch: 1,
+        volume: !isMuted ? 0 : 1
+      });
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <button
           onClick={togglePlay}
-          disabled={isLoading || !audio}
+          disabled={!selectedVoice}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={`Listen to guide for ${placeName}`}
         >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              <span>Generating Audio...</span>
-            </>
-          ) : isPlaying ? (
+          {isPlaying ? (
             <>
               <Pause className="w-4 h-4" />
               <span>Pause Guide</span>
@@ -163,7 +130,7 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
         </button>
         <button
           onClick={toggleMute}
-          disabled={isLoading || !audio}
+          disabled={!isPlaying}
           className="flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={isMuted ? "Unmute" : "Mute"}
         >

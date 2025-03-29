@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { UserPreferences, Itinerary, Place, FoodSpot } from '../types';
+import type { UserPreferences, Itinerary, Place, FoodSpot, TourPlanWithHotels } from '../types';
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -123,153 +123,77 @@ function validateFoodData(data: unknown): data is FoodSpot[] {
   );
 }
 
-export async function generateTourItinerary(preferences: UserPreferences): Promise<Itinerary> {
+export async function generateTourItinerary(preferences: UserPreferences): Promise<TourPlanWithHotels> {
   try {
-    // First, generate the main itinerary with more specific instructions
-    const prompt = `Create a detailed tour itinerary for ${preferences.location} based on these preferences:
-- Duration: ${preferences.duration} hours
-- Interests: ${preferences.interests.join(', ')}
-- Pace: ${preferences.pace}
-${preferences.additionalNotes ? `Additional notes: ${preferences.additionalNotes}` : ''}
+    const prompt = `Generate a detailed tour itinerary for ${preferences.location} with the following preferences:
+      - Duration: ${preferences.duration} days
+      - Transport Mode: ${preferences.transportMode}
+      - Interests: ${preferences.interests.join(", ")}
+      
+      Format the response as a JSON object with:
+      - title: A catchy title for the tour
+      - places: Array of locations to visit, each with:
+        - name: Place name
+        - description: Brief description
+        - duration: Recommended time in minutes
+        - location: [latitude, longitude]
+        - type: Type of place (landmark, museum, park, etc.)
+        - historicalFacts: Array of interesting historical facts
+        - bestTimeToVisit: Best time to visit this place
+        - highlights: Array of key highlights
+      - transportTimes: Array of estimated travel times between places in minutes
+      - hotels: Array of 3 hotel recommendations, each with:
+        - name: Hotel name
+        - type: "budget", "mid-range", or "luxury"
+        - pricePerNight: Price in INR
+        - rating: Rating out of 5
+        - description: Brief description
+        - amenities: Array of available amenities
+        - location: Location description
+      - duration: Number of days for the tour
+      - preferences: Object containing user preferences
+      
+      Focus on creating a realistic, time-appropriate itinerary that matches the interests.
+      For hotels, ensure a mix of budget, mid-range, and luxury options with realistic pricing.`;
 
-IMPORTANT: You must respond with ONLY a valid JSON object, no other text. The JSON must follow this exact structure:
-{
-  "title": "Descriptive tour title",
-  "places": [{
-    "id": "unique_string",
-    "name": "Place name",
-    "description": "A detailed, engaging description that includes:
-      - Historical significance and background
-      - Key features and highlights
-      - Interesting facts and stories
-      - Best times to visit
-      - What makes it special
-      - Cultural or architectural significance
-      Format it as a natural, engaging narrative like a tour guide would tell it.",
-    "location": [latitude, longitude],
-    "duration": minutes_as_number,
-    "type": "attraction_type",
-    "historicalFacts": ["fact1", "fact2", "fact3"],
-    "bestTimeToVisit": "specific time or season",
-    "highlights": ["highlight1", "highlight2", "highlight3"]
-  }],
-  "totalDuration": total_minutes_as_number,
-  "transportTimes": [minutes_between_stops_as_numbers],
-  "transportMode": "walking"
-}
-
-Ensure all coordinates are accurate and verified for ${preferences.location}.
-Duration should be realistic for each location.
-Make the descriptions engaging and informative, like a professional tour guide would tell them.`;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ 
-        role: "system", 
-        content: "You are a knowledgeable tour guide with accurate information about locations worldwide. You must respond with ONLY valid JSON, no other text or explanations. The response must be a single JSON object that can be parsed by JSON.parse()."
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
       },
-      { role: "user", content: prompt }],
-      temperature: 0.7
-    });
-
-    const responseContent = completion.choices[0].message.content;
-    if (!responseContent) {
-      throw new Error('Empty response from API');
-    }
-
-    let itineraryData;
-    try {
-      // Clean the response content to ensure it's valid JSON
-      const cleanedContent = responseContent.trim().replace(/^```json\n?|\n?```$/g, '');
-      itineraryData = JSON.parse(cleanedContent);
-    } catch (error) {
-      console.error('Failed to parse API response:', responseContent);
-      throw new Error('Invalid JSON response from API. Please try again.');
-    }
-    
-    if (!validateItineraryData(itineraryData)) {
-      console.error('Invalid itinerary data:', itineraryData);
-      throw new Error('Invalid itinerary data structure received from API');
-    }
-
-    // Calculate the route from places
-    const route = itineraryData.places.map((place: Place) => place.location);
-    
-    // Calculate optimal meal time slots based on the tour schedule
-    const mealTimeSlots = calculateMealTimeSlots(itineraryData.places);
-    
-    // Generate food recommendations for each meal slot
-    const foodPromises = mealTimeSlots.map(async slot => {
-      const nearbyPrompt = `Suggest 1-2 highly-rated food spots near ${slot.nearestPlace} in ${preferences.location} for ${slot.time}. The food spot should be within 500 meters of coordinates [${slot.location.join(', ')}]. Consider:
-- Must be open during ${slot.time} hours
-- Should be easily accessible from the tour route
-- Verified cuisine types and specialties
-- Recent reviews and ratings
-- Exact coordinates
-
-Please provide a JSON array response where each food spot has:
-{
-  "id": "unique_string",
-  "name": "Verified restaurant name",
-  "location": [exact_latitude, exact_longitude],
-  "type": "restaurant|cafe|street_food|food_court",
-  "cuisineTypes": ["cuisine1", "cuisine2"],
-  "priceRange": "budget|moderate|expensive",
-  "rating": number_0_to_5,
-  "reviews": number_of_reviews,
-  "openingHours": "verified_hours",
-  "description": "detailed_description",
-  "recommendations": ["dish1", "dish2"],
-  "distance": distance_in_km_from_nearest_stop
-}
-
-Ensure all information is current and verified.`;
-
-      const foodCompletion = await openai.chat.completions.create({
+      body: JSON.stringify({
         model: "gpt-4",
-        messages: [{ 
-          role: "system", 
-          content: "You are a local food expert with up-to-date knowledge of restaurants and eateries. Provide only verified information with accurate coordinates and current operating hours."
-        },
-        { role: "user", content: nearbyPrompt }],
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert travel guide with deep knowledge of locations worldwide. Generate detailed, accurate tour itineraries based on user preferences."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
         temperature: 0.7,
-      });
-
-      return JSON.parse(foodCompletion.choices[0].message.content || '[]');
+      })
     });
 
-    const foodSpotsArrays = await Promise.all(foodPromises);
-    const foodData = foodSpotsArrays.flat();
-    
-    if (!validateFoodData(foodData)) {
-      throw new Error('Invalid food recommendation data structure received from API');
+    if (!response.ok) {
+      throw new Error('Failed to generate itinerary');
     }
 
-    // Filter food spots to ensure they're actually along the route
-    const filteredFoodSpots = foodData.filter(spot => {
-      // Find minimum distance to any point on the route
-      const minDistance = Math.min(...route.map(point => 
-        calculateDistance(point, spot.location)
-      ));
-      return minDistance <= 0.5; // Within 500 meters of the route
-    });
+    const data = await response.json();
+    const tourData = JSON.parse(data.choices[0].message.content);
 
-    // Combine the itinerary with food recommendations
-    return {
-      ...itineraryData,
-      transportation: itineraryData.transportMode || 'walking',
-      notes: 'Generated tour itinerary',
-      foodRecommendations: filteredFoodSpots,
-    };
+    // Add IDs to hotels
+    tourData.hotels = tourData.hotels.map((hotel: any, index: number) => ({
+      ...hotel,
+      id: index + 1
+    }));
 
+    return tourData as TourPlanWithHotels;
   } catch (error) {
     console.error('Error generating itinerary:', error);
-    if (error instanceof SyntaxError) {
-      throw new Error('Failed to parse API response. Please try again.');
-    }
-    if (error instanceof Error) {
-      throw error;
-    }
     throw new Error('Failed to generate itinerary. Please try again.');
   }
 }

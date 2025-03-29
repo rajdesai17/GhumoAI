@@ -8,12 +8,13 @@ import MyTours from './components/MyTours';
 import RentalServices from './components/RentalServices';
 import LandingPage from './components/LandingPage';
 import RefillStations from './components/RefillStations';
-import { Itinerary, UserPreferences } from './types';
+import AIAgent from './components/AIAgent';
+import { TourPlanWithHotels, UserPreferences } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import { generateTourItinerary } from './lib/openai';
 
 function TourPlanner() {
-  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
+  const [itinerary, setItinerary] = useState<TourPlanWithHotels | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentLocation, setCurrentLocation] = useState<[number, number] | undefined>(undefined);
@@ -162,8 +163,9 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/plan-tour" element={<TourPlanner />} />
               <Route path="/my-tours" element={<MyTours />} />
-              <Route path="/rent-vehicle" element={<RentalServices />} />
+              <Route path="/vehicle-rental" element={<RentalServices />} />
               <Route path="/refill-stations" element={<RefillStations />} />
+              <Route path="/ai-agent" element={<AIAgent />} />
             </Routes>
           </main>
         </div>

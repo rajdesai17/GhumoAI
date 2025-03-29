@@ -46,3 +46,26 @@ export interface Itinerary {
   foodRecommendations?: FoodSpot[];
   tips?: string[];
 }
+
+export interface HotelOption {
+  id: number;
+  name: string;
+  type: 'budget' | 'mid-range' | 'luxury';
+  pricePerNight: number;
+  rating: number;
+  description: string;
+  amenities: string[];
+  location: string;
+  imageUrl?: string;
+}
+
+export interface TourPlanWithHotels extends Itinerary {
+  hotels: HotelOption[];
+  selectedHotelId?: number;
+  duration: number; // in days
+  preferences: {
+    budget?: 'budget' | 'mid-range' | 'luxury';
+    interests: string[];
+    nearBy?: string;
+  };
+}
