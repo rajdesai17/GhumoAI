@@ -6,7 +6,10 @@ import Map from './components/Map';
 import TourDetails from './components/TourDetails';
 import VehicleRental from './components/RentalServices';
 import Navbar from './components/Navbar';
+import MyTours from './components/MyTours';
 import { generateTourItinerary } from './lib/openai';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import type { UserPreferences, Itinerary } from './types';
 
 function TourPlanner() {
@@ -14,6 +17,7 @@ function TourPlanner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
+  const { user } = useAuth();
   
   const handlePreferencesSubmit = async (preferences: UserPreferences) => {
     setLoading(true);
@@ -63,6 +67,7 @@ function TourPlanner() {
                   itinerary={itinerary}
                   onSaveTour={() => console.log('Saving tour...')}
                   onStartNavigation={() => console.log('Starting navigation...')}
+                  canSave={!!user}
                 />
               </div>
               
@@ -85,26 +90,24 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
 
   return (
-    <Router>
-      {showLanding ? (
-        <LandingPage onGetStarted={() => setShowLanding(false)} />
-      ) : (
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <div className="pt-16">
-            <Routes>
-              <Route path="/" element={<TourPlanner />} />
-              <Route path="/vehicle-rental" element={<VehicleRental />} />
-              <Route path="/my-tours" element={
-                <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-                  <h1 className="text-3xl font-bold text-gray-900">My Tours (Coming Soon)</h1>
-                </div>
-              } />
-            </Routes>
+    <AuthProvider>
+      <Router>
+        {showLanding ? (
+          <LandingPage onGetStarted={() => setShowLanding(false)} />
+        ) : (
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <div className="pt-16">
+              <Routes>
+                <Route path="/" element={<TourPlanner />} />
+                <Route path="/vehicle-rental" element={<VehicleRental />} />
+                <Route path="/my-tours" element={<MyTours />} />
+              </Routes>
+            </div>
           </div>
-        </div>
-      )}
-    </Router>
+        )}
+      </Router>
+    </AuthProvider>
   );
 }
 

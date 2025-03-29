@@ -1,16 +1,29 @@
-import React from 'react';
-import { Navigation, Car, MapPin, Calendar, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { Navigation, Car, MapPin, Calendar, ArrowLeft, User, LogOut } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import AuthModal from './auth/AuthModal';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900';
   };
 
   const showBackButton = location.pathname !== '/';
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   return (
     <>
@@ -44,12 +57,33 @@ export default function Navbar() {
                 <Calendar className="w-5 h-5" />
                 <span>My Tours</span>
               </Link>
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-600">{user.email}</span>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <User className="w-5 h-5" />
+                  <span>Sign In</span>
+                </button>
+              )}
             </div>
           </div>
         </nav>
       </header>
       {/* Spacer div to prevent content from going under navbar */}
       <div className="h-16" />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   );
 } 

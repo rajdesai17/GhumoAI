@@ -8,3 +8,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export type User = {
+  id: string;
+  email: string;
+  created_at: string;
+};
+
+export type SavedTour = {
+  id: string;
+  user_id: string;
+  title: string;
+  destinations: string[];
+  created_at: string;
+};

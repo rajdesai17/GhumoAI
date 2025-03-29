@@ -1,17 +1,19 @@
 export interface UserPreferences {
   location: string;
-  duration: number;
+  coordinates?: [number, number];
   interests: string[];
+  duration: number; // in hours
+  transportMode: 'walking' | 'driving' | 'transit' | 'bicycling';
+  budget: 'low' | 'medium' | 'high';
   pace: 'relaxed' | 'moderate' | 'intense';
   additionalNotes?: string;
-  coordinates?: [number, number]; // latitude, longitude
 }
 
 export interface Place {
   id: string;
   name: string;
   description: string;
-  location: [number, number]; // [latitude, longitude]
+  location: [number, number];
   duration: number; // in minutes
   type: string;
 }
@@ -34,9 +36,9 @@ export interface FoodSpot {
 export interface Itinerary {
   title: string;
   places: Place[];
-  totalDuration: number;
-  transportMode: string;
-  route: [number, number][]; // Array of [latitude, longitude] coordinates
-  transportTimes: number[]; // Array of times between places in minutes
+  transportation: string;
+  notes: string;
+  totalDuration: number; // in minutes
+  transportTimes: number[]; // array of travel times between places in minutes
   foodRecommendations: FoodSpot[];
 }
