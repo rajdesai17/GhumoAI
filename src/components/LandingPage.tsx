@@ -1,110 +1,168 @@
 import React from 'react';
-import { Navigation, Car, MapPin, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { MapPin, Car, Compass, Users, Handshake } from 'lucide-react';
 
-interface LandingPageProps {
-  onGetStarted: () => void;
-}
-
-export default function LandingPage({ onGetStarted }: LandingPageProps) {
-  const navigate = useNavigate();
-
-  const handleGetStarted = () => {
-    onGetStarted();
-    navigate('/');
-  };
-
+const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-white/80 backdrop-blur-sm fixed w-full top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Navigation className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">GhumoAI</span>
-            </div>
-            <div className="flex items-center space-x-8">
-              <button
-                onClick={() => navigate('/')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <MapPin className="w-5 h-5" />
-                <span>Plan Tour</span>
-              </button>
-              <button
-                onClick={() => navigate('/vehicle-rental')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Car className="w-5 h-5" />
-                <span>Vehicle Rental</span>
-              </button>
-              <button
-                onClick={() => navigate('/my-tours')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Calendar className="w-5 h-5" />
-                <span>My Tours</span>
-              </button>
-              <button
-                onClick={handleGetStarted}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors ml-4"
-              >
-                Get Started
-              </button>
-            </div>
-          </div>
-        </nav>
-      </header>
-
-      <main className="pt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-20">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Discover Your Perfect Journey with AI
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="container mx-auto px-4 py-24 relative">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-5xl font-bold mb-6">
+              Explore India with Ghumo
             </h1>
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-              Experience personalized travel itineraries crafted by AI. Enter your preferences,
-              and let us plan the perfect tour for you.
+            <p className="text-xl mb-8 text-blue-100">
+              Your one-stop platform for personalized tours, vehicle rentals, and unforgettable travel experiences.
             </p>
-            <button
-              onClick={handleGetStarted}
-              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+            <Link
+              to="/plan-tour"
+              className="inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
-              Start Planning Your Tour
-            </button>
+              Start Planning
+              <Compass className="w-5 h-5 ml-2" />
+            </Link>
           </div>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12">
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="text-blue-600 mb-4">
-                <Navigation className="w-8 h-8" />
+      {/* Features Section */}
+      <div className="py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            Why Choose Ghumo?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Smart Navigation</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Personalized Tours
+              </h3>
               <p className="text-gray-600">
-                Get optimized routes based on your transportation preferences and available time.
+                Get customized travel itineraries based on your preferences and interests.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="text-blue-600 mb-4">
-                <Navigation className="w-8 h-8" />
+
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Car className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Personalized Tours</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Easy Vehicle Rental
+              </h3>
               <p className="text-gray-600">
-                Discover tours tailored to your interests, from history to food to culture.
+                Rent vehicles hassle-free with our wide range of options and competitive prices.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="text-blue-600 mb-4">
-                <Navigation className="w-8 h-8" />
+
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Local Insights</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Local Expertise
+              </h3>
               <p className="text-gray-600">
-                Get AI-powered recommendations for the best local experiences and hidden gems.
+                Access local knowledge and recommendations for the best travel experiences.
               </p>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Services Section */}
+      <div className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            Our Services
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Link
+              to="/plan-tour"
+              className="group bg-gray-50 p-6 rounded-lg hover:bg-blue-50 transition-colors"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Compass className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600">
+                  Tour Planning
+                </h3>
+              </div>
+              <p className="text-gray-600">
+                Create personalized travel itineraries with our AI-powered tour planner.
+              </p>
+            </Link>
+
+            <Link
+              to="/vehicle-rental"
+              className="group bg-gray-50 p-6 rounded-lg hover:bg-green-50 transition-colors"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Car className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-green-600">
+                  Vehicle Rental
+                </h3>
+              </div>
+              <p className="text-gray-600">
+                Rent cars, bikes, and trucks from trusted partners across India.
+              </p>
+            </Link>
+
+            <Link
+              to="/vehicle-rental"
+              className="group bg-gray-50 p-6 rounded-lg hover:bg-orange-50 transition-colors"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Handshake className="w-6 h-6 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-orange-600">
+                  Partner With Us
+                </h3>
+              </div>
+              <p className="text-gray-600">
+                Join our network of vehicle rental partners and grow your business.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Start Your Journey?
+          </h2>
+          <p className="text-xl mb-8 text-blue-100">
+            Join thousands of travelers who trust Ghumo for their travel needs.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/plan-tour"
+              className="inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Plan Your Tour
+              <Compass className="w-5 h-5 ml-2" />
+            </Link>
+            <Link
+              to="/vehicle-rental"
+              className="inline-flex items-center px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+            >
+              Rent a Vehicle
+              <Car className="w-5 h-5 ml-2" />
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default LandingPage;

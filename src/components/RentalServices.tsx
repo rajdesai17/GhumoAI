@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Filter, Car, Bike, Truck, Clock, Users, Fuel } from 'lucide-react';
+import { Search, Filter, Car, Bike, Truck, Clock, Users, Fuel, Handshake } from 'lucide-react';
+import PartnershipForm from './PartnershipForm';
 
 interface Vehicle {
   id: string;
@@ -59,6 +60,7 @@ const RentalServices: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<'all' | 'car' | 'bike' | 'truck'>('all');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [showPartnershipForm, setShowPartnershipForm] = useState(false);
 
   const filteredVehicles = vehicles.filter(vehicle => {
     const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -69,7 +71,16 @@ const RentalServices: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Vehicle Rental Services</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Vehicle Rental Services</h1>
+        <button
+          onClick={() => setShowPartnershipForm(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Handshake className="w-5 h-5" />
+          Partner With Us
+        </button>
+      </div>
       
       {/* Search and Filters */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -180,6 +191,10 @@ const RentalServices: React.FC = () => {
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">No vehicles found matching your criteria.</p>
         </div>
+      )}
+
+      {showPartnershipForm && (
+        <PartnershipForm onClose={() => setShowPartnershipForm(false)} />
       )}
     </div>
   );

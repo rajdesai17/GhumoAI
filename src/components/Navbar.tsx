@@ -4,14 +4,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
 
-export default function Navbar() {
+const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
   const isActive = (path: string) => {
-    return location.pathname === path ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900';
+    return location.pathname === path;
   };
 
   const showBackButton = location.pathname !== '/';
@@ -45,16 +45,37 @@ export default function Navbar() {
               </Link>
             </div>
             <div className="flex items-center space-x-8">
-              <Link to="/" className={`flex items-center space-x-2 ${isActive('/')}`}>
+              <Link
+                to="/plan-tour"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/plan-tour')
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
                 <MapPin className="w-5 h-5" />
                 <span>Plan Tour</span>
               </Link>
-              <Link to="/vehicle-rental" className={`flex items-center space-x-2 ${isActive('/vehicle-rental')}`}>
+              <Link
+                to="/vehicle-rental"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/vehicle-rental')
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
                 <Car className="w-5 h-5" />
-                <span>Vehicle Rental</span>
+                <span>Rent Vehicle</span>
               </Link>
-              <Link to="/my-tours" className={`flex items-center space-x-2 ${isActive('/my-tours')}`}>
-                <Calendar className="w-5 h-5" />
+              <Link
+                to="/my-tours"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/my-tours')
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <User className="w-5 h-5" />
                 <span>My Tours</span>
               </Link>
               {user ? (
@@ -86,4 +107,6 @@ export default function Navbar() {
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   );
-} 
+};
+
+export default Navbar; 
