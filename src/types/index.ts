@@ -3,6 +3,7 @@ export interface UserPreferences {
   duration: string;
   transportMode: 'walking' | 'biking' | 'car' | 'public';
   interests: string[];
+  coordinates?: [number, number]; // latitude, longitude
 }
 
 export interface Place {

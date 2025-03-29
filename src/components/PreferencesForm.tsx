@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Clock, Car, Heart } from 'lucide-react';
+import { MapPin, Clock, Car, Heart, Loader2, Crosshair } from 'lucide-react';
 import type { UserPreferences } from '../types';
 
 interface PreferencesFormProps {
@@ -13,17 +13,63 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
     duration: '2hours',
     transportMode: 'walking',
     interests: [],
+    coordinates: undefined
   });
 
-  const interestOptions = [
-    'History', 'Food', 'Nature', 'Culture', 'Art', 
-    'Shopping', 'Nightlife', 'Architecture'
-  ];
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string>();
+
+  const handleGetCurrentLocation = () => {
+    setIsGettingLocation(true);
+    setLocationError(undefined);
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          // Use reverse geocoding to get the location name
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
+          );
+          const data = await response.json();
+          
+          setPreferences(prev => ({
+            ...prev,
+            location: data.display_name.split(',')[0], // Use first part of address
+            coordinates: [position.coords.latitude, position.coords.longitude]
+          }));
+        } catch (error) {
+          setLocationError('Failed to get location name');
+        } finally {
+          setIsGettingLocation(false);
+        }
+      },
+      (error) => {
+        setLocationError('Failed to get your location. Please ensure location access is enabled.');
+        setIsGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(preferences);
   };
+
+  const interestOptions = [
+    'History', 'Food', 'Nature', 'Culture', 'Art', 
+    'Shopping', 'Nightlife', 'Architecture'
+  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -35,14 +81,32 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
             <MapPin className="w-5 h-5" />
             <span>Location</span>
           </label>
-          <input
-            type="text"
-            value={preferences.location}
-            onChange={(e) => setPreferences({ ...preferences, location: e.target.value })}
-            placeholder="Enter your location"
-            className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
+          <div className="relative">
+            <input
+              type="text"
+              value={preferences.location}
+              onChange={(e) => setPreferences({ ...preferences, location: e.target.value })}
+              placeholder="Enter your location"
+              className="w-full px-4 py-2 pr-10 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+            <button
+              type="button"
+              onClick={handleGetCurrentLocation}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 hover:text-blue-600 transition-colors"
+              title="Use current location"
+              disabled={isGettingLocation}
+            >
+              {isGettingLocation ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Crosshair className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+          {locationError && (
+            <p className="mt-1 text-sm text-red-600">{locationError}</p>
+          )}
         </div>
 
         <div>
@@ -115,10 +179,7 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
       >
         {isLoading ? (
           <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
             Generating Tour...
           </>
         ) : (

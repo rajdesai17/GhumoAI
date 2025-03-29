@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import PreferencesForm from './components/PreferencesForm';
@@ -14,14 +14,25 @@ function TourPlanner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [focusedPlaceId, setFocusedPlaceId] = useState<string>();
+  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
   
   const handlePreferencesSubmit = async (preferences: UserPreferences) => {
     setLoading(true);
     setError(undefined);
     
+    // Update map center if user provided coordinates
+    if (preferences.coordinates) {
+      setMapCenter(preferences.coordinates);
+    }
+    
     try {
       const tourData = await generateTourItinerary(preferences);
       setItinerary(tourData);
+      
+      // If we have places, center the map on the first location
+      if (tourData.places.length > 0) {
+        setMapCenter(tourData.places[0].location);
+      }
     } catch (err) {
       console.error('Error generating tour:', err);
       setError('Failed to generate tour itinerary. Please try again.');
@@ -29,6 +40,11 @@ function TourPlanner() {
       setLoading(false);
     }
   };
+
+  // Reset focused place when itinerary changes
+  useEffect(() => {
+    setFocusedPlaceId(undefined);
+  }, [itinerary]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,7 +75,7 @@ function TourPlanner() {
               <div className="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
                 <div className="h-[500px]">
                   <Map
-                    center={[40.7128, -74.0060]} // Default to NYC
+                    center={mapCenter}
                     itinerary={itinerary}
                     focusedPlaceId={focusedPlaceId}
                   />

@@ -1,68 +1,74 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Itinerary, Place } from '../types';
+import { Icon } from 'leaflet';
+import type { Itinerary } from '../types';
+
+// Fix for default marker icon
+const icon = new Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 interface MapProps {
-  itinerary?: Itinerary;
   center: [number, number];
-  focusedPlaceId?: string;
+  itinerary?: Itinerary;
 }
 
-// Helper component to handle map view updates
-function MapController({ place }: { place?: Place }) {
+// Component to handle map center updates
+function MapUpdater({ center }: { center: [number, number] }) {
   const map = useMap();
-  
   useEffect(() => {
-    if (place) {
-      map.setView(place.location, 15, { animate: true });
-    }
-  }, [map, place]);
-
+    map.setView(center, map.getZoom());
+  }, [center, map]);
   return null;
 }
 
-export default function Map({ itinerary, center, focusedPlaceId }: MapProps) {
-  const focusedPlace = itinerary?.places.find(place => place.id === focusedPlaceId);
+export default function Map({ center, itinerary }: MapProps) {
+  const places = itinerary?.places || [];
+  const route = itinerary?.route || [];
 
   return (
     <MapContainer
       center={center}
       zoom={13}
-      className="w-full h-full rounded-lg"
+      style={{ height: '100%', width: '100%' }}
     >
+      <MapUpdater center={center} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      {itinerary?.places.map((place: Place) => (
-        <Marker 
-          key={place.id} 
-          position={place.location}
-          opacity={focusedPlaceId ? (place.id === focusedPlaceId ? 1 : 0.5) : 1}
-        >
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-bold">{place.name}</h3>
-              <p className="text-sm">{place.description}</p>
-              <p className="text-xs mt-1">Duration: {place.duration} min</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-
-      {itinerary?.route && (
+      {/* Show route if available */}
+      {route.length > 0 && (
         <Polyline
-          key="route"
-          positions={itinerary.route}
+          positions={route}
           color="blue"
           weight={3}
-          opacity={focusedPlaceId ? 0.3 : 0.7}
+          opacity={0.6}
         />
       )}
 
-      <MapController place={focusedPlace} />
+      {/* Show all places */}
+      {places.map((place, index) => (
+        <Marker
+          key={place.id}
+          position={place.location}
+          icon={icon}
+        >
+          <Popup>
+            <div className="font-semibold">{place.name}</div>
+            <div className="text-sm text-gray-600">Stop {index + 1}</div>
+            {place.description && (
+              <div className="mt-2 text-sm">{place.description}</div>
+            )}
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 }
