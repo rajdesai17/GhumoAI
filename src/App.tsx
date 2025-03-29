@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import PreferencesForm from './components/PreferencesForm';
@@ -13,7 +13,6 @@ function TourPlanner() {
   const [itinerary, setItinerary] = useState<Itinerary>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [focusedPlaceId, setFocusedPlaceId] = useState<string>();
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
   
   const handlePreferencesSubmit = async (preferences: UserPreferences) => {
@@ -41,11 +40,6 @@ function TourPlanner() {
     }
   };
 
-  // Reset focused place when itinerary changes
-  useEffect(() => {
-    setFocusedPlaceId(undefined);
-  }, [itinerary]);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -68,7 +62,6 @@ function TourPlanner() {
                   itinerary={itinerary}
                   onSaveTour={() => console.log('Saving tour...')}
                   onStartNavigation={() => console.log('Starting navigation...')}
-                  onViewLocation={setFocusedPlaceId}
                 />
               </div>
               
@@ -77,7 +70,6 @@ function TourPlanner() {
                   <Map
                     center={mapCenter}
                     itinerary={itinerary}
-                    focusedPlaceId={focusedPlaceId}
                   />
                 </div>
               </div>
