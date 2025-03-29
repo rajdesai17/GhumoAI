@@ -21,16 +21,16 @@ export interface Place {
 export interface FoodSpot {
   id: string;
   name: string;
+  description: string;
   location: [number, number];
-  type: 'restaurant' | 'cafe' | 'street_food' | 'food_court';
+  type: string;
   cuisineTypes: string[];
   priceRange: 'budget' | 'moderate' | 'expensive';
   rating: number;
   reviews: number;
   openingHours: string;
-  description: string;
+  distance?: number;
   recommendations: string[];
-  distance?: number; // Distance from nearest tour spot
 }
 
 export interface Itinerary {
@@ -40,5 +40,6 @@ export interface Itinerary {
   notes: string;
   totalDuration: number; // in minutes
   transportTimes: number[]; // array of travel times between places in minutes
-  foodRecommendations: FoodSpot[];
+  foodRecommendations?: FoodSpot[];
+  tips?: string[];
 }
