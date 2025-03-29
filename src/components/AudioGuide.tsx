@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Play, Pause, Volume2, VolumeX, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Pause, Volume2, VolumeX, Info, AlertCircle } from 'lucide-react';
 import { textToSpeech } from '../lib/elevenLabs';
 
 interface AudioGuideProps {
@@ -24,6 +24,8 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Create the narrative text
   const narrative = `Welcome to ${placeName}! ${fullText} ${
@@ -47,27 +49,45 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
     const generateAudio = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         const audioBuffer = await textToSpeech(narrative);
         
         if (!isMounted) return;
 
+        // Clean up previous audio URL if it exists
+        if (audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+        }
+
         const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
         const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+
         const newAudio = new Audio(url);
         
         newAudio.onended = () => {
-          setIsPlaying(false);
+          if (isMounted) {
+            setIsPlaying(false);
+          }
         };
 
         newAudio.onerror = (error) => {
           console.error('Audio playback error:', error);
-          setIsPlaying(false);
+          if (isMounted) {
+            setIsPlaying(false);
+            setError('Failed to play audio. Please try again.');
+          }
         };
 
-        setAudio(newAudio);
+        if (isMounted) {
+          setAudio(newAudio);
+        }
       } catch (error) {
         console.error('Error generating audio:', error);
-        setIsPlaying(false);
+        if (isMounted) {
+          setIsPlaying(false);
+          setError(error instanceof Error ? error.message : 'Failed to generate audio guide');
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -81,10 +101,13 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
       isMounted = false;
       if (audio) {
         audio.pause();
-        URL.revokeObjectURL(audio.src);
+        audio.src = '';
+      }
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
       }
     };
-  }, [narrative]);
+  }, [narrative, audioUrl]);
 
   // Handle mute/unmute
   const toggleMute = () => {
@@ -95,15 +118,21 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
   };
 
   // Handle play/pause
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!audio) return;
 
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
+    try {
+      if (isPlaying) {
+        await audio.pause();
+      } else {
+        await audio.play();
+      }
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+      setError('Failed to play audio. Please try again.');
     }
-    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -111,7 +140,7 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
       <div className="flex items-center gap-2">
         <button
           onClick={togglePlay}
-          disabled={isLoading}
+          disabled={isLoading || !audio}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={`Listen to guide for ${placeName}`}
         >
@@ -134,7 +163,7 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
         </button>
         <button
           onClick={toggleMute}
-          disabled={isLoading}
+          disabled={isLoading || !audio}
           className="flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={isMuted ? "Unmute" : "Mute"}
         >
@@ -152,6 +181,13 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
           <Info className="w-4 h-4" />
         </button>
       </div>
+      
+      {error && (
+        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-2 rounded-lg">
+          <AlertCircle className="w-4 h-4" />
+          <span>{error}</span>
+        </div>
+      )}
       
       {showDetails && (
         <div className="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
