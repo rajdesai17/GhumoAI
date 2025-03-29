@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigation } from 'lucide-react';
+import { Navigation, Car, MapPin, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface LandingPageProps {
@@ -23,12 +23,35 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               <Navigation className="w-8 h-8 text-blue-600" />
               <span className="text-2xl font-bold text-gray-900">GhumoAI</span>
             </div>
-            <button
-              onClick={handleGetStarted}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Get Started
-            </button>
+            <div className="flex items-center space-x-8">
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <MapPin className="w-5 h-5" />
+                <span>Plan Tour</span>
+              </button>
+              <button
+                onClick={() => navigate('/vehicle-rental')}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <Car className="w-5 h-5" />
+                <span>Vehicle Rental</span>
+              </button>
+              <button
+                onClick={() => navigate('/my-tours')}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <Calendar className="w-5 h-5" />
+                <span>My Tours</span>
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors ml-4"
+              >
+                Get Started
+              </button>
+            </div>
           </div>
         </nav>
       </header>

@@ -4,11 +4,10 @@ import LandingPage from './components/LandingPage';
 import PreferencesForm from './components/PreferencesForm';
 import Map from './components/Map';
 import TourDetails from './components/TourDetails';
-import VehicleRental from './components/VehicleRental';
+import VehicleRental from './components/RentalServices';
 import Navbar from './components/Navbar';
 import { generateTourItinerary } from './lib/openai';
 import type { UserPreferences, Itinerary } from './types';
-import RentalServices from './components/RentalServices';
 
 function TourPlanner() {
   const [itinerary, setItinerary] = useState<Itinerary>();
@@ -43,7 +42,7 @@ function TourPlanner() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <main className="max-w-[90rem] mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="space-y-8">
           {!itinerary ? (
             <>
@@ -57,8 +56,9 @@ function TourPlanner() {
               </div>
             </>
           ) : (
-            <>
-              <div className="max-w-3xl mx-auto">
+            <div className="flex gap-8">
+              {/* Left side: Tour Details */}
+              <div className="w-[45%] min-w-[400px]">
                 <TourDetails 
                   itinerary={itinerary}
                   onSaveTour={() => console.log('Saving tour...')}
@@ -66,15 +66,14 @@ function TourPlanner() {
                 />
               </div>
               
-              <div className="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-[500px]">
-                  <Map
-                    center={mapCenter}
-                    itinerary={itinerary}
-                  />
-                </div>
+              {/* Right side: Map */}
+              <div className="flex-1 bg-white rounded-lg shadow-lg overflow-hidden sticky top-24 h-[calc(100vh-8rem)]">
+                <Map
+                  center={mapCenter}
+                  itinerary={itinerary}
+                />
               </div>
-            </>
+            </div>
           )}
         </div>
       </main>
@@ -95,7 +94,7 @@ function App() {
           <div className="pt-16">
             <Routes>
               <Route path="/" element={<TourPlanner />} />
-              <Route path="/rental-services" element={<RentalServices />} />
+              <Route path="/vehicle-rental" element={<VehicleRental />} />
               <Route path="/my-tours" element={
                 <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
                   <h1 className="text-3xl font-bold text-gray-900">My Tours (Coming Soon)</h1>
