@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot, Menu, X } from 'lucide-react';
+import { Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot, Menu, X, Star } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
@@ -40,6 +40,7 @@ const Navbar: React.FC = () => {
       <header className="bg-white/95 backdrop-blur-md fixed w-full top-0 z-50 border-b border-slate-200 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
           <div className="flex items-center justify-between h-full">
+            {/* Left section: Logo and back button */}
             <div className="flex items-center space-x-4">
               {showBackButton && (
                 <button
@@ -71,41 +72,56 @@ const Navbar: React.FC = () => {
             </button>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-6">
-              {navLinks.map(({ path, icon: Icon, label }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                    isActive(path)
-                      ? 'bg-blue-50 text-blue-600 shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{label}</span>
-                </Link>
-              ))}
-              {user ? (
-                <div className="flex items-center space-x-4 pl-4 border-l border-slate-200">
-                  <span className="text-sm text-slate-600">{user.email}</span>
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
+            <div className="hidden lg:flex items-center">
+              {/* Navigation Links */}
+              <div className="flex items-center space-x-2">
+                {navLinks.map(({ path, icon: Icon, label }) => (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      isActive(path)
+                        ? 'bg-blue-50 text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                    <Icon className="w-4 h-4" />
+                    <span>{label}</span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Premium and Auth Section */}
+              <div className="flex items-center ml-6 space-x-4">
+                <Link
+                  to="/premium"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
-                  <User className="w-4 h-4" />
-                  <span>Sign In</span>
-                </button>
-              )}
+                  <Star className="w-4 h-4" />
+                  <span>Go Premium</span>
+                </Link>
+
+                {user ? (
+                  <div className="flex items-center space-x-4 pl-4 border-l border-slate-200">
+                    <span className="text-sm text-slate-600 truncate max-w-[150px]">{user.email}</span>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -131,9 +147,19 @@ const Navbar: React.FC = () => {
                   <span>{label}</span>
                 </Link>
               ))}
+
+              <Link
+                to="/premium"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+              >
+                <Star className="w-5 h-5" />
+                <span>Go Premium</span>
+              </Link>
+
               {user ? (
                 <div className="border-t border-slate-200 pt-4 mt-4">
-                  <div className="px-4 py-2 text-sm text-slate-600">{user.email}</div>
+                  <div className="px-4 py-2 text-sm text-slate-600 truncate">{user.email}</div>
                   <button
                     onClick={() => {
                       handleSignOut();

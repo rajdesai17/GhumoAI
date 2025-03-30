@@ -9,6 +9,7 @@ import RentalServices from './components/RentalServices';
 import LandingPage from './components/LandingPage';
 import RefillStations from './components/RefillStations';
 import AIAgent from './components/AIAgent';
+import Premium from './components/Premium';
 import { TourPlanWithHotels, UserPreferences } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import { generateTourItinerary } from './lib/openai';
@@ -177,6 +178,7 @@ function App() {
                 <Route path="/vehicle-rental" element={<RentalServices />} />
                 <Route path="/refill-stations" element={<RefillStations />} />
                 <Route path="/ai-agent" element={<AIAgent />} />
+                <Route path="/premium" element={<Premium />} />
               </Routes>
             </>
           )}
