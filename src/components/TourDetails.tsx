@@ -153,46 +153,10 @@ export default function TourDetails({
                           <p className="text-sm text-gray-600 pr-6 line-clamp-2">
                             {getBriefDescription(place.description)}
                           </p>
-                          <button
-                            onClick={() => setExpandedPlace(expandedPlace === index ? null : index)}
-                            className="absolute right-0 top-0 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                            title="Toggle details"
-                          >
-                            <Info className="w-4 h-4" />
-                          </button>
+                      
                         </div>
 
-                        {expandedPlace === index && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border border-gray-100 text-sm text-gray-600">
-                            <p className="mb-3">{place.description}</p>
-                            {place.historicalFacts && place.historicalFacts.length > 0 && (
-                              <div className="mb-3">
-                                <strong className="text-gray-900">Historical Facts:</strong>
-                                <ul className="list-disc list-inside mt-1 space-y-1">
-                                  {place.historicalFacts.map((fact, i) => (
-                                    <li key={i}>{fact}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {place.bestTimeToVisit && (
-                              <div className="mb-3">
-                                <strong className="text-gray-900">Best Time to Visit:</strong>
-                                <p className="mt-1">{place.bestTimeToVisit}</p>
-                              </div>
-                            )}
-                            {place.highlights && place.highlights.length > 0 && (
-                              <div>
-                                <strong className="text-gray-900">Highlights:</strong>
-                                <ul className="list-disc list-inside mt-1 space-y-1">
-                                  {place.highlights.map((highlight, i) => (
-                                    <li key={i}>{highlight}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                        )}
+            
 
                         <div className="flex items-center gap-2 mt-3">
                           <AudioGuide
