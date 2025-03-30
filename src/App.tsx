@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PreferencesForm from './components/PreferencesForm';
 import TourDetails from './components/TourDetails';
@@ -12,6 +12,7 @@ import AIAgent from './components/AIAgent';
 import { TourPlanWithHotels, UserPreferences } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import { generateTourItinerary } from './lib/openai';
+import LanguageLoader from './components/LanguageLoader';
 
 function TourPlanner() {
   const [itinerary, setItinerary] = useState<TourPlanWithHotels | null>(null);
@@ -87,11 +88,7 @@ function TourPlanner() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LanguageLoader />;
   }
 
   if (error) {
@@ -153,19 +150,36 @@ function TourPlanner() {
 }
 
 function App() {
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loader for 3 seconds
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
         <div className="bg-gray-50">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/plan-tour" element={<TourPlanner />} />
-            <Route path="/my-tours" element={<MyTours />} />
-            <Route path="/vehicle-rental" element={<RentalServices />} />
-            <Route path="/refill-stations" element={<RefillStations />} />
-            <Route path="/ai-agent" element={<AIAgent />} />
-          </Routes>
+          {initialLoading ? (
+            <LanguageLoader duration={1000} />
+          ) : (
+            <>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/plan-tour" element={<TourPlanner />} />
+                <Route path="/my-tours" element={<MyTours />} />
+                <Route path="/vehicle-rental" element={<RentalServices />} />
+                <Route path="/refill-stations" element={<RefillStations />} />
+                <Route path="/ai-agent" element={<AIAgent />} />
+              </Routes>
+            </>
+          )}
         </div>
       </Router>
     </AuthProvider>
