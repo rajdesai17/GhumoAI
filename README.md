@@ -1,4 +1,4 @@
-﻿# **GhumoAI** - Your AI Travel Companion
+# **GhumoAI** - Your AI Travel Companion
 
 ## 🚀 Project Description
 
@@ -33,8 +33,21 @@ GhumoAI is an innovative AI-powered travel planning platform that creates person
 
 ## 📷 Features Preview
 
-| ![Plan Tour](/public/plan-tour.png "AI Tour Planning") | ![Vehicle Rental](/public/rental.png "Vehicle Rental") | ![Refill Stations](/public/refill.png "Water Refill") | ![AI Assistant](/public/ai-chat.png "AI Assistant") |
-|:---:|:---:|:---:|:---:|
+| Landing Page | Tour Generator | Generated Tour |
+|-------------|-------------|-------------|
+| ![Screenshot 1](https://github.com/user-attachments/assets/fb9a59f2-efe7-46f4-844d-8546d4931e44) | ![Screenshot 2](https://github.com/user-attachments/assets/09b0b812-c954-4756-af85-38010c1bc566) | ![Screenshot 3](https://github.com/user-attachments/assets/6cbc3b1b-1d76-44d9-8ac2-05b24a35a156) |
+
+| Rental Services | Refill Stations | AI Agent |
+|-------------|-------------|-------------|
+| ![Screenshot 4](https://github.com/user-attachments/assets/e6607b60-bd5c-4b77-b522-4580b92a90d4) | ![Screenshot 5](https://github.com/user-attachments/assets/d72aab8b-59e3-413f-b767-52f568ec4c60) | ![Screenshot 6](https://github.com/user-attachments/assets/52488a45-923b-4e8f-9838-dcffb6bdafbb) |
+
+| Premium Membership |
+|-------------|
+| ![Screenshot 7](https://github.com/user-attachments/assets/312ab678-7b60-4e9f-8692-22103defda2e) |
+
+
+
+
 
 ## 📦 Prerequisites
 
