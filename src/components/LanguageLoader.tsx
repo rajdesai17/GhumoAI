@@ -6,6 +6,7 @@ interface LanguageLoaderProps {
 }
 
 const greetings = [
+  { text: 'नमस्कार', language: 'Marathi' },
   { text: 'नमस्ते', language: 'Hindi' },
   { text: 'નમસ્તે', language: 'Gujarati' },
   { text: 'ನಮಸ್ಕಾರ', language: 'Kannada' },
@@ -14,8 +15,7 @@ const greetings = [
   { text: 'ନମସ୍କାର', language: 'Odia' },
   { text: 'নমস্কার', language: 'Bengali' },
   { text: 'ਸਤਿ ਸ਼੍ਰੀ ਅਕਾਲ', language: 'Punjabi' },
-  { text: 'नमस्कार', language: 'Marathi' },
-  { text: 'Namaste', language: 'English' }
+  { text: 'Welcome', language: 'English' }
 ];
 
 // Calculate duration per greeting to fit within 3.5 seconds

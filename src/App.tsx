@@ -89,7 +89,11 @@ function TourPlanner() {
   };
 
   if (loading) {
-    return <LanguageLoader />;
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
@@ -154,10 +158,10 @@ function App() {
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    // Show loader for 3 seconds
+    // Show loader only for initial app load
     const timer = setTimeout(() => {
       setInitialLoading(false);
-    }, 3000);
+    }, 3500); // Match the TOTAL_DURATION from LanguageLoader
 
     return () => clearTimeout(timer);
   }, []);
@@ -167,7 +171,7 @@ function App() {
       <Router>
         <div className="bg-gray-50">
           {initialLoading ? (
-            <LanguageLoader duration={1000} />
+            <LanguageLoader onComplete={() => setInitialLoading(false)} />
           ) : (
             <>
               <Navbar />
