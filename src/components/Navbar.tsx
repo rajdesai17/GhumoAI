@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Navigation, Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot, Menu, X } from 'lucide-react';
+import { Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot, Menu, X } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
+import logo from '../assets/logo.png';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -37,7 +38,7 @@ const Navbar: React.FC = () => {
   return (
     <>
       <header className="bg-white/95 backdrop-blur-md fixed w-full top-0 z-50 border-b border-slate-200 shadow-sm">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-4">
               {showBackButton && (
@@ -48,11 +49,12 @@ const Navbar: React.FC = () => {
                   <ArrowLeft className="w-5 h-5" />
                 </button>
               )}
-              <Link to="/" className="flex items-center space-x-3 group">
-                <Navigation className="w-8 h-8 text-blue-600 transform group-hover:rotate-12 transition-transform duration-200" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                  GhumoAI
-                </span>
+              <Link to="/" className="flex items-center group">
+                <img 
+                  src={logo} 
+                  alt="GhumoAI Logo" 
+                  className="w-48 h-16 object-contain transform group-hover:scale-105 transition-transform duration-200"
+                />
               </Link>
             </div>
 
@@ -160,7 +162,7 @@ const Navbar: React.FC = () => {
         </nav>
       </header>
       {/* Spacer div to prevent content from going under navbar */}
-      <div className="h-16" />
+      <div className="h-20" />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   );
