@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Info, AlertCircle } from 'lucide-react';
-import { textToSpeech, getVoices, stopSpeaking, resumeSpeaking, isPaused } from '../lib/elevenLabs';
+import { Play, Pause, Volume2, VolumeX, Info, AlertCircle, Loader2 } from 'lucide-react';
+import { textToSpeech, getVoices, stopSpeaking, resumeSpeaking, isPaused } from '../lib/speech';
 
 interface AudioGuideProps {
   briefText: string;
@@ -23,7 +23,9 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [voiceInitialized, setVoiceInitialized] = useState(false);
 
   // Create the narrative text with proper formatting
   const narrative = [
@@ -44,45 +46,95 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
 
   // Initialize voice when component mounts
   useEffect(() => {
+    let mounted = true;
+    const maxRetries = 3;
+    let retryCount = 0;
+
     const loadVoices = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+        
         const voices = await getVoices();
+        if (!mounted) return;
+
         if (voices.length > 0) {
-          // Try to find an English voice
-          const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
-          setSelectedVoice(englishVoice || voices[0]);
+          // Try to find a good English voice
+          const englishVoice = voices.find(voice => 
+            voice.lang.startsWith('en-') && 
+            (voice.name.includes('Google') || voice.name.includes('Microsoft'))
+          ) || voices.find(voice => voice.lang.startsWith('en-')) || voices[0];
+
+          setSelectedVoice(englishVoice);
+          setVoiceInitialized(true);
+        } else {
+          throw new Error('No suitable voices found');
         }
       } catch (error) {
+        if (!mounted) return;
         console.error('Error loading voices:', error);
-        setError('Failed to load text-to-speech voices');
+        
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Retrying voice initialization (${retryCount}/${maxRetries})...`);
+          setTimeout(loadVoices, 1000); // Retry after 1 second
+        } else {
+          setError('Failed to initialize text-to-speech. Please try refreshing the page.');
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadVoices();
+    return () => {
+      mounted = false;
+      stopSpeaking();
+    };
   }, []);
 
   // Handle play/pause
   const togglePlay = async () => {
     try {
+      setError(null);
+      
       if (isPlaying) {
         if (isPaused()) {
           resumeSpeaking();
         } else {
           stopSpeaking();
+          setIsPlaying(false);
         }
       } else {
+        setIsLoading(true);
         await textToSpeech(narrative, {
           voice: selectedVoice || undefined,
           rate: 0.9, // Slightly slower for better clarity
           pitch: 1,
-          volume: isMuted ? 0 : 1
+          volume: isMuted ? 0 : 1,
+          onStart: () => {
+            setIsPlaying(true);
+            setIsLoading(false);
+          },
+          onEnd: () => {
+            setIsPlaying(false);
+            setIsLoading(false);
+          },
+          onError: (errorMessage) => {
+            console.error('Speech synthesis error:', errorMessage);
+            setError('Failed to play audio. Please try again.');
+            setIsPlaying(false);
+            setIsLoading(false);
+          }
         });
       }
-      setIsPlaying(!isPlaying);
     } catch (error) {
       console.error('Error playing audio:', error);
-      setIsPlaying(false);
       setError(error instanceof Error ? error.message : 'Failed to play audio guide');
+      setIsPlaying(false);
+      setIsLoading(false);
     }
   };
 
@@ -95,28 +147,31 @@ const AudioGuide: React.FC<AudioGuideProps> = ({
         voice: selectedVoice || undefined,
         rate: 0.9,
         pitch: 1,
-        volume: !isMuted ? 0 : 1
+        volume: !isMuted ? 0 : 1,
+        onError: (errorMessage) => {
+          console.error('Speech synthesis error:', errorMessage);
+          setError('Failed to update audio settings. Please try again.');
+          setIsPlaying(false);
+        }
       });
     }
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopSpeaking();
-    };
-  }, []);
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <button
           onClick={togglePlay}
-          disabled={!selectedVoice}
+          disabled={!voiceInitialized || isLoading}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title={`Listen to guide for ${placeName}`}
         >
-          {isPlaying ? (
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Loading...</span>
+            </>
+          ) : isPlaying ? (
             <>
               <Pause className="w-4 h-4" />
               <span>Pause Guide</span>
