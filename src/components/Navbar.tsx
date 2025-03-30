@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigation, Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot } from 'lucide-react';
+import { Navigation, Car, MapPin, ArrowLeft, User, LogOut, Droplet, Bot, Menu, X } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
@@ -9,6 +9,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -25,87 +26,118 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const navLinks = [
+    { path: '/plan-tour', icon: MapPin, label: 'Plan Tour' },
+    { path: '/vehicle-rental', icon: Car, label: 'Rent Vehicle' },
+    { path: '/refill-stations', icon: Droplet, label: 'Refill Stations' },
+    { path: '/ai-agent', icon: Bot, label: 'AI Agent' },
+    { path: '/my-tours', icon: User, label: 'My Tours' },
+  ];
+
   return (
     <>
-      <header className="bg-white/95 backdrop-blur-sm fixed w-full top-0 z-50 border-b border-gray-200 shadow-sm">
+      <header className="bg-white/95 backdrop-blur-md fixed w-full top-0 z-50 border-b border-slate-200 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-4">
               {showBackButton && (
                 <button
                   onClick={() => navigate(-1)}
-                  className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
               )}
-              <Link to="/" className="flex items-center space-x-3">
-                <Navigation className="w-8 h-8 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-900">GhumoAI</span>
+              <Link to="/" className="flex items-center space-x-3 group">
+                <Navigation className="w-8 h-8 text-blue-600 transform group-hover:rotate-12 transition-transform duration-200" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  GhumoAI
+                </span>
               </Link>
             </div>
-            <div className="flex items-center space-x-8">
-              <Link
-                to="/plan-tour"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isActive('/plan-tour')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <MapPin className="w-5 h-5" />
-                <span>Plan Tour</span>
-              </Link>
-              <Link
-                to="/vehicle-rental"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isActive('/vehicle-rental')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Car className="w-5 h-5" />
-                <span>Rent Vehicle</span>
-              </Link>
-              <Link
-                to="/refill-stations"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isActive('/refill-stations')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Droplet className="w-5 h-5" />
-                <span>Refill Stations</span>
-              </Link>
-              <Link
-                to="/ai-agent"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isActive('/ai-agent')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Bot className="w-5 h-5" />
-                <span>AI Agent</span>
-              </Link>
-              <Link
-                to="/my-tours"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isActive('/my-tours')
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <User className="w-5 h-5" />
-                <span>My Tours</span>
-              </Link>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden flex items-center text-slate-600 hover:text-slate-900 transition-all duration-200"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-6">
+              {navLinks.map(({ path, icon: Icon, label }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive(path)
+                      ? 'bg-blue-50 text-blue-600 shadow-sm'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{label}</span>
+                </Link>
+              ))}
               {user ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-600">{user.email}</span>
+                <div className="flex items-center space-x-4 pl-4 border-l border-slate-200">
+                  <span className="text-sm text-slate-600">{user.email}</span>
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Sign In</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div
+            className={`lg:hidden fixed inset-x-0 top-16 bg-white border-b border-slate-200 shadow-lg transition-all duration-300 transform ${
+              isMobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+            }`}
+          >
+            <div className="px-4 py-6 space-y-4">
+              {navLinks.map(({ path, icon: Icon, label }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+                    isActive(path)
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{label}</span>
+                </Link>
+              ))}
+              {user ? (
+                <div className="border-t border-slate-200 pt-4 mt-4">
+                  <div className="px-4 py-2 text-sm text-slate-600">{user.email}</div>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>Sign Out</span>
@@ -113,8 +145,11 @@ const Navbar: React.FC = () => {
                 </div>
               ) : (
                 <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  onClick={() => {
+                    setShowAuthModal(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
                 >
                   <User className="w-5 h-5" />
                   <span>Sign In</span>

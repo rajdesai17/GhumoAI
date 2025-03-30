@@ -85,36 +85,32 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
 
   return (
     <div className="min-h-[calc(100vh-12rem)] bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-auto overflow-hidden">
-        <div className="p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8 sm:space-y-12">
+        <div className="space-y-6 sm:space-y-8">
           {/* Location Input */}
-          <div className="space-y-3">
-            <label className="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900">
-              <MapPin className="w-5 h-5 text-blue-500" />
-              Where would you like to go?
+          <div className="space-y-3 sm:space-y-4">
+            <label className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-slate-900">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+              Where would you like to explore?
             </label>
             <div className="relative max-w-xl mx-auto">
               <input
                 type="text"
                 value={preferences.location}
                 onChange={(e) => setPreferences({ ...preferences, location: e.target.value })}
-                placeholder="Enter your destination"
-                className="w-full px-6 py-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-slate-800 text-center text-lg"
-                required
+                placeholder="Enter a city or location"
+                className="w-full pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               />
-              <button
-                type="button"
-                onClick={handleGetCurrentLocation}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50"
-                title="Use current location"
-                disabled={isGettingLocation}
-              >
-                {isGettingLocation ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Crosshair className="w-5 h-5" />
-                )}
-              </button>
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
+              {preferences.location && (
+                <button
+                  type="button"
+                  onClick={handleGetCurrentLocation}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  <Crosshair className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 hover:text-blue-600" />
+                </button>
+              )}
             </div>
             {locationError && (
               <p className="text-sm text-red-600 text-center">{locationError}</p>
@@ -122,56 +118,62 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
           </div>
 
           {/* Duration Selection */}
-          <div className="space-y-3">
-            <label className="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900">
-              <Clock className="w-5 h-5 text-blue-500" />
+          <div className="space-y-3 sm:space-y-4">
+            <label className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-slate-900">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
               How long would you like to explore?
             </label>
-            <div className="max-w-xl mx-auto">
-              <select
-                value={preferences.duration}
-                onChange={(e) => setPreferences({ ...preferences, duration: parseInt(e.target.value) })}
-                className="w-full px-6 py-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-slate-800 text-center text-lg appearance-none"
-              >
-                <option value={2}>2 Hours</option>
-                <option value={4}>4 Hours</option>
-                <option value={8}>8 Hours (Full Day)</option>
-              </select>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto">
+              {[2, 4, 6, 8].map(hours => (
+                <button
+                  key={hours}
+                  type="button"
+                  onClick={() => setPreferences({ ...preferences, duration: hours })}
+                  className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200
+                    ${preferences.duration === hours
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                  <div className="text-lg sm:text-xl mb-1">{hours}</div>
+                  <div className="text-xs sm:text-sm">Hours</div>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Transport Mode */}
-          <div className="space-y-3">
-            <label className="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900">
-              <Car className="w-5 h-5 text-blue-500" />
+          {/* Transport Mode Selection */}
+          <div className="space-y-3 sm:space-y-4">
+            <label className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-slate-900">
+              <Car className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
               How would you like to get around?
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto">
               {transportOptions.map(mode => (
                 <button
                   key={mode.id}
                   type="button"
                   onClick={() => setPreferences({ ...preferences, transportMode: mode.id as UserPreferences['transportMode'] })}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2
+                  className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2
                     ${preferences.transportMode === mode.id
                       ? 'border-blue-500 bg-blue-50 text-blue-700'
                       : 'border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50'
                     }`}
                 >
-                  <span className="text-2xl">{mode.icon}</span>
-                  <span className="font-medium">{mode.label}</span>
+                  <span className="text-xl sm:text-2xl">{mode.icon}</span>
+                  <span className="text-xs sm:text-sm font-medium">{mode.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Interests Selection */}
-          <div className="space-y-3">
-            <label className="flex items-center justify-center gap-2 text-lg font-semibold text-slate-900">
-              <Heart className="w-5 h-5 text-blue-500" />
+          <div className="space-y-3 sm:space-y-4">
+            <label className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-slate-900">
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
               What interests you?
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
               {interestOptions.map(interest => (
                 <button
                   key={interest.id}
@@ -182,45 +184,37 @@ export default function PreferencesForm({ onSubmit, isLoading }: PreferencesForm
                       : [...preferences.interests, interest.label];
                     setPreferences({ ...preferences, interests: newInterests });
                   }}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2
+                  className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200
                     ${preferences.interests.includes(interest.label)
                       ? 'border-blue-500 bg-blue-50 text-blue-700'
                       : 'border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50'
                     }`}
                 >
-                  <span className="text-2xl">{interest.icon}</span>
-                  <span className="font-medium">{interest.label}</span>
+                  <span className="text-xs sm:text-sm font-medium">{interest.label}</span>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="p-8 bg-slate-50 border-t border-slate-100">
-          <div className="max-w-xl mx-auto">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full flex items-center justify-center py-4 px-6 rounded-xl transition-all duration-200 text-lg font-semibold
-                ${isLoading 
-                  ? 'bg-blue-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
-                } text-white`}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-                  Creating Your Perfect Tour...
-                </>
-              ) : (
-                <>
-                  Generate Itinerary
-                  <span className="ml-2">✨</span>
-                </>
-              )}
-            </button>
-          </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            disabled={isLoading || !preferences.location}
+            className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 text-white rounded-full text-sm sm:text-base font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                <span>Planning...</span>
+              </>
+            ) : (
+              <>
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Plan My Tour</span>
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>

@@ -46,23 +46,23 @@ const PartnershipForm: React.FC<PartnershipFormProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Partner With Us</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-[100]">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto relative">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-3 sm:p-4 flex justify-between items-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Partner With Us</h2>
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
 
+        <div className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Business Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Business Information</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Business Information</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -138,7 +138,7 @@ const PartnershipForm: React.FC<PartnershipFormProps> = ({ onClose }) => {
                   Business Address
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                   <textarea
                     required
                     value={formData.address}
@@ -159,7 +159,7 @@ const PartnershipForm: React.FC<PartnershipFormProps> = ({ onClose }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Vehicle Types
                 </label>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-4">
                   <button
                     type="button"
                     onClick={() => toggleVehicleType('car')}
@@ -206,11 +206,11 @@ const PartnershipForm: React.FC<PartnershipFormProps> = ({ onClose }) => {
                 <input
                   type="number"
                   required
-                  min="1"
+                  min="0"
                   value={formData.vehicleCount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, vehicleCount: parseInt(e.target.value) }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, vehicleCount: Number(e.target.value) }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter number of vehicles"
+                  placeholder="0"
                 />
               </div>
             </div>
@@ -220,24 +220,24 @@ const PartnershipForm: React.FC<PartnershipFormProps> = ({ onClose }) => {
               <h3 className="text-lg font-semibold text-gray-900">Commission Information</h3>
               
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-700">
+                <p className="text-blue-700">
                   Our platform charges a commission of {formData.commission}% on each booking. 
                   This helps us maintain the platform and provide marketing services to reach more customers.
                 </p>
               </div>
             </div>
 
-            <div className="flex justify-end gap-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Submit Partnership Request
               </button>

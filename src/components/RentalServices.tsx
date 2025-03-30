@@ -70,132 +70,118 @@ const RentalServices: React.FC = () => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Vehicle Rental Services</h1>
-        <button
-          onClick={() => setShowPartnershipForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <Handshake className="w-5 h-5" />
-          Partner With Us
-        </button>
-      </div>
-      
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8">
+      <div className="container mx-auto px-4">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Vehicle Rental</h1>
+          <p className="text-base sm:text-lg text-slate-600">
+            Rent vehicles for your tour and explore at your own pace.
+          </p>
+        </div>
+
+        {/* Search and Filter Section */}
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search vehicles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search vehicles..."
+                className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-          </div>
-          
-          <div className="flex gap-4">
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Types</option>
-              <option value="car">Cars</option>
-              <option value="bike">Bikes</option>
-              <option value="truck">Trucks</option>
-            </select>
-            
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                className="w-24 px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Min"
-              />
-              <span className="text-gray-500">-</span>
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                className="w-24 px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Max"
-              />
+
+            {/* Type Filter */}
+            <div>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value as any)}
+                className="w-full px-4 py-2 text-sm sm:text-base border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Types</option>
+                <option value="car">Cars</option>
+                <option value="bike">Bikes</option>
+                <option value="truck">Trucks</option>
+              </select>
+            </div>
+
+            {/* Price Range Filter */}
+            <div className="sm:col-span-2">
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min={0}
+                  max={1000}
+                  value={priceRange[0]}
+                  onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                  className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm sm:text-base text-slate-600 whitespace-nowrap">
+                  Up to ₹{priceRange[0]}/hr
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Vehicle List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredVehicles.map((vehicle) => (
-          <div
-            key={vehicle.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                {vehicle.type === 'car' && <Car className="w-6 h-6 text-blue-500" />}
-                {vehicle.type === 'bike' && <Bike className="w-6 h-6 text-green-500" />}
-                {vehicle.type === 'truck' && <Truck className="w-6 h-6 text-orange-500" />}
-                <h3 className="text-xl font-semibold text-gray-900">{vehicle.name}</h3>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                vehicle.available
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {vehicle.available ? 'Available' : 'Not Available'}
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span>{vehicle.transmission}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Fuel className="w-4 h-4" />
-                  <span>{vehicle.fuelType}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  <span>{vehicle.capacity} seats</span>
-                </div>
-                <div className="text-lg font-semibold text-blue-600">
-                  ₹{vehicle.pricePerDay}/day
-                </div>
-              </div>
-            </div>
-
-            <button
-              className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              disabled={!vehicle.available}
+        {/* Vehicle Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {filteredVehicles.map((vehicle) => (
+            <div
+              key={vehicle.id}
+              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6"
             >
-              {vehicle.available ? 'Rent Now' : 'Not Available'}
-            </button>
-          </div>
-        ))}
-      </div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {vehicle.type === 'car' && <Car className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />}
+                  {vehicle.type === 'bike' && <Bike className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />}
+                  {vehicle.type === 'truck' && <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />}
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-900">{vehicle.name}</h3>
+                </div>
+                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                  vehicle.available
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {vehicle.available ? 'Available' : 'Not Available'}
+                </span>
+              </div>
 
-      {filteredVehicles.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No vehicles found matching your criteria.</p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm sm:text-base">
+                  <span className="text-slate-600">Price per hour</span>
+                  <span className="font-semibold text-slate-900">₹{vehicle.pricePerDay}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm sm:text-base">
+                  <span className="text-slate-600">Capacity</span>
+                  <span className="font-semibold text-slate-900">{vehicle.capacity} persons</span>
+                </div>
+                <div className="flex items-center justify-between text-sm sm:text-base">
+                  <span className="text-slate-600">Location</span>
+                  <span className="font-semibold text-slate-900">{vehicle.location}</span>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setShowPartnershipForm(true)}
+                  className="flex-1 px-4 py-2 text-sm sm:text-base font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Partner
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
 
-      {showPartnershipForm && (
-        <PartnershipForm onClose={() => setShowPartnershipForm(false)} />
-      )}
+        {/* Partnership Form Modal */}
+        {showPartnershipForm && (
+          <PartnershipForm onClose={() => setShowPartnershipForm(false)} />
+        )}
+      </div>
     </div>
   );
 };

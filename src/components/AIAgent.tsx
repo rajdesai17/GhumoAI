@@ -423,41 +423,41 @@ Would you like to plan another trip?`;
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-4xl">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-blue-600 p-4 text-white">
-          <div className="flex items-center gap-3">
-            <Bot className="w-6 h-6" />
-            <h1 className="text-xl font-semibold">AI Travel Assistant</h1>
+        <div className="bg-blue-600 p-3 sm:p-4 text-white">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Bot className="w-5 h-5 sm:w-6 sm:h-6" />
+            <h1 className="text-lg sm:text-xl font-semibold">AI Travel Assistant</h1>
           </div>
-          <p className="text-blue-100 mt-2">
+          <p className="text-sm sm:text-base text-blue-100 mt-2">
             Ask me to plan your trip and suggest hotels! Try:
             "Plan a trip to Jaipur for 3 days"
           </p>
         </div>
 
         {/* Messages */}
-        <div className="h-[500px] overflow-y-auto p-4 space-y-4">
+        <div className="h-[400px] sm:h-[500px] overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
-              <Bot className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-lg font-medium">Hello! How can I help you today?</p>
+            <div className="text-center text-gray-500 mt-6 sm:mt-8">
+              <Bot className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-gray-400" />
+              <p className="text-base sm:text-lg font-medium">Hello! How can I help you today?</p>
               <div className="mt-4 space-y-2">
-                <div className="flex items-center gap-2 justify-center text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-2 justify-center text-xs sm:text-sm text-gray-600">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Plan multi-day itineraries</span>
                 </div>
-                <div className="flex items-center gap-2 justify-center text-sm text-gray-600">
-                  <Hotel className="w-4 h-4" />
+                <div className="flex items-center gap-2 justify-center text-xs sm:text-sm text-gray-600">
+                  <Hotel className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Get hotel recommendations</span>
                 </div>
-                <div className="flex items-center gap-2 justify-center text-sm text-gray-600">
-                  <MapPin className="w-4 h-4" />
+                <div className="flex items-center gap-2 justify-center text-xs sm:text-sm text-gray-600">
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Discover local attractions</span>
                 </div>
-                <div className="flex items-center gap-2 justify-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-2 justify-center text-xs sm:text-sm text-gray-600">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Optimize your schedule</span>
                 </div>
               </div>
@@ -496,8 +496,8 @@ Would you like to plan another trip?`;
           )}
         </div>
 
-        {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t">
+        {/* Input Form */}
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t">
           <div className="flex gap-2">
             <input
               type="text"
@@ -508,14 +508,14 @@ Would you like to plan another trip?`;
                   ? "Type your name, email and phone number (each on a new line)"
                   : "Type your message here..."
               }
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </form>
