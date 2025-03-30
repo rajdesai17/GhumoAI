@@ -156,18 +156,16 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="bg-gray-50">
           <Navbar />
-          <main className="pt-16">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/plan-tour" element={<TourPlanner />} />
-              <Route path="/my-tours" element={<MyTours />} />
-              <Route path="/vehicle-rental" element={<RentalServices />} />
-              <Route path="/refill-stations" element={<RefillStations />} />
-              <Route path="/ai-agent" element={<AIAgent />} />
-            </Routes>
-          </main>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/plan-tour" element={<TourPlanner />} />
+            <Route path="/my-tours" element={<MyTours />} />
+            <Route path="/vehicle-rental" element={<RentalServices />} />
+            <Route path="/refill-stations" element={<RefillStations />} />
+            <Route path="/ai-agent" element={<AIAgent />} />
+          </Routes>
         </div>
       </Router>
     </AuthProvider>
