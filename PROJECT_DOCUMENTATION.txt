@@ -1,0 +1,197 @@
+GHUMO AI - TOUR PLANNING APPLICATION
+===================================
+
+1. PROJECT OVERVIEW
+------------------
+Ghumo AI is an intelligent tour planning application that creates personalized travel itineraries using AI. It combines OpenAI's capabilities with mapping services to generate optimized travel plans based on user preferences.
+
+2. HOW THE PROJECT WORKS
+----------------------
+1. User Interaction:
+   - User enters preferences (location, duration, interests)
+   - System collects and validates input data
+   - Preferences are formatted for AI processing
+
+2. AI Processing (OpenAI):
+   - User preferences sent to OpenAI API
+   - GPT-4 generates initial itinerary
+   - System validates and structures AI response
+   - Adds relevant points of interest
+
+3. Data Processing:
+   - Fetches location data from mapping APIs
+   - Calculates distances between points
+   - Optimizes route sequence
+   - Adds transport time estimates
+   - Integrates hotel and food recommendations
+
+4. Map Integration:
+   - Displays generated itinerary on map
+   - Shows real-time user location
+   - Provides navigation between points
+   - Updates route based on user movement
+
+5. Final Output:
+   - Complete tour plan with timings
+   - Interactive map with all locations
+   - Hotel and food recommendations
+   - Navigation instructions
+   - Option to save/share itinerary
+
+3. TECHNICAL STACK
+----------------
+Frontend:
+- React 18
+- TypeScript
+- Vite (Build Tool)
+- Tailwind CSS (Styling)
+- React Router (Navigation)
+
+Mapping & Location:
+- Leaflet (Interactive Maps)
+- OpenLayers (Alternative Mapping)
+- Google Maps API
+
+AI & Backend:
+- OpenAI API
+- Supabase (Database & Authentication)
+
+4. CORE FEATURES
+--------------
+- AI-Powered Tour Planning
+- Interactive Map Navigation
+- Real-time Location Tracking
+- Hotel Recommendations
+- Food Spot Suggestions
+- Vehicle Rental Integration
+- Refill Station Locator
+- Premium Features
+
+5. ALGORITHM WORKFLOW
+-------------------
+1. User Input Collection:
+   - Collects preferences (duration, budget, interests, etc.)
+   - Validates input data
+
+2. AI Processing:
+   - Sends preferences to OpenAI API
+   - Generates optimized itinerary
+   - Validates response structure
+
+3. Location Processing:
+   - Calculates distances between points
+   - Optimizes route sequence
+   - Determines optimal meal times
+   - Adds transport time estimates
+
+4. Map Integration:
+   - Displays itinerary on interactive map
+   - Shows current location
+   - Provides navigation between points
+   - Highlights active locations
+
+5. DATA FETCHING & API INTEGRATION
+--------------------------------
+1. OpenAI API Integration:
+   - Uses OpenAI's GPT-4 model for itinerary generation
+   - API Key stored securely in environment variables
+   - Structured prompt engineering for consistent responses
+   - Response validation and error handling
+   - Rate limiting and retry mechanisms
+
+2. Data Fetching Flow:
+   a) User Preferences:
+      - Form data collected via React state
+      - Validated before API submission
+      - Structured into OpenAI-friendly format
+
+   b) Location Data:
+      - Fetched from Google Maps/Leaflet APIs
+      - Cached for performance
+      - Real-time updates for current location
+      - Geocoding for address-to-coordinates
+
+   c) Hotel & Food Data:
+      - Integrated with third-party APIs
+      - Cached results for similar queries
+      - Filtered based on user preferences
+      - Distance-based sorting
+
+   d) Route Data:
+      - Calculated using distance matrix API
+      - Optimized for time and distance
+      - Includes transport mode options
+      - Real-time traffic updates
+
+3. API Response Handling:
+   - Structured response parsing
+   - Error state management
+   - Loading state indicators
+   - Fallback mechanisms
+   - Data persistence in Supabase
+
+4. Caching Strategy:
+   - Local storage for user preferences
+   - Session storage for temporary data
+   - API response caching
+   - Map tile caching
+   - Route calculation caching
+
+7. DATA STRUCTURES
+----------------
+TourPlanWithHotels:
+- Title
+- Places array
+- Total duration
+- Transport times
+- Hotel recommendations
+- Food spots
+
+Place:
+- ID
+- Name
+- Description
+- Location (lat, long)
+- Duration
+- Type
+
+8. KEY COMPONENTS
+---------------
+- TourPlanner: Main itinerary generation
+- Map: Interactive map display
+- PreferencesForm: User input collection
+- TourDetails: Itinerary display
+- AIAgent: AI interaction interface
+- RentalServices: Vehicle rental integration
+- RefillStations: Charging/refueling points
+
+9. SECURITY & AUTHENTICATION
+--------------------------
+- Supabase authentication
+- Environment variable management
+- Secure API key handling
+- User session management
+
+10. ERROR HANDLING
+---------------
+- Input validation
+- API error handling
+- Location service errors
+- Network error management
+- User feedback system
+
+11. PERFORMANCE OPTIMIZATIONS
+--------------------------
+- Lazy loading of components
+- Caching of API responses
+- Optimized map rendering
+- Efficient route calculations
+- Background data processing
+
+12. FUTURE ENHANCEMENTS
+--------------------
+- Multi-language support
+- Offline functionality
+- Social sharing features
+- Advanced AI recommendations
+- Integration with more services 
